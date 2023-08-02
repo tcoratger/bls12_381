@@ -1,5 +1,5 @@
 import unittest
-from src.utils import sbb, mac
+from src.utils import sbb, mac, adc
 
 
 class TestSbb(unittest.TestCase):
@@ -77,6 +77,41 @@ class TestMac(unittest.TestCase):
         self.assertEqual(
             mac(0x0, 0x0, 0x0, 0x0),
             (0x0, 0x0),
+        )
+
+
+class TestAdc(unittest.TestCase):
+    # Test cases with no carry
+    def test_no_carry(self):
+        self.assertEqual(
+            adc(0x123456789ABCDEF0, 0x23456789ABCDEF12, 0x0),
+            (0x3579BE02468ACE02, 0x0),
+        )
+        self.assertEqual(
+            adc(0xFFFFFFFFFFFFFFFF, 0x1, 0x0),
+            (0x0, 0x1),
+        )
+
+    # Test cases with carry
+    def test_with_carry(self):
+        self.assertEqual(
+            adc(0x123456789ABCDEF0, 0x23456789ABCDEF12, 0x1),
+            (0x3579BE02468ACE03, 0x0),
+        )
+        self.assertEqual(
+            adc(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF),
+            (0xFFFFFFFFFFFFFFFD, 0x2),
+        )
+
+    # Test case with zero input
+    def test_zero_input(self):
+        self.assertEqual(
+            adc(0x0, 0x0, 0x0),
+            (0x0, 0x0),
+        )
+        self.assertEqual(
+            adc(0x0, 0xFFFFFFFFFFFFFFFF, 0x0),
+            (0xFFFFFFFFFFFFFFFF, 0x0),
         )
 
 
