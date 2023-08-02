@@ -1,5 +1,5 @@
 import unittest
-from src.utils import sbb, mac, adc
+from src.utils import sbb, mac, adc, wrapping_mul_u64
 
 
 class TestSbb(unittest.TestCase):
@@ -112,6 +112,29 @@ class TestAdc(unittest.TestCase):
         self.assertEqual(
             adc(0x0, 0xFFFFFFFFFFFFFFFF, 0x0),
             (0xFFFFFFFFFFFFFFFF, 0x0),
+        )
+
+
+class TestWrappingMulU64(unittest.TestCase):
+    def test_positive_numbers(self):
+        self.assertEqual(wrapping_mul_u64(10, 20), 200)
+        self.assertEqual(wrapping_mul_u64(2**32, 2**32), 0)
+        self.assertEqual(wrapping_mul_u64(2**63 - 1, 2), 2**64 - 2)
+
+    def test_zero(self):
+        self.assertEqual(wrapping_mul_u64(0, 1234), 0)
+        self.assertEqual(wrapping_mul_u64(9876, 0), 0)
+
+    def test_overflow(self):
+        self.assertEqual(wrapping_mul_u64(2**63, 2**63), 0)
+        self.assertEqual(wrapping_mul_u64(2**64 - 1, 2**64 - 1), 1)
+
+    def test_large_numbers(self):
+        self.assertEqual(
+            wrapping_mul_u64(2**62 - 1, 2**62 - 1), 9223372036854775809
+        )
+        self.assertEqual(
+            wrapping_mul_u64(1234567890123456, 9876543210987654), 3007213678458421376
         )
 
 
