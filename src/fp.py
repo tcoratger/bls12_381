@@ -1,4 +1,4 @@
-from utils import sbb, mac, adc
+from src.utils import sbb, mac, adc, wrapping_mul_u64
 
 
 class CtOption:
@@ -44,7 +44,7 @@ class Fp:
         # Handbook of Applied Cryptography
         # <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
 
-        k = t0 * INV
+        k = wrapping_mul_u64(t0, INV)
         _, carry = mac(t0, k, MODULUS[0], 0)
         r1, carry = mac(t1, k, MODULUS[1], carry)
         r2, carry = mac(t2, k, MODULUS[2], carry)
@@ -53,7 +53,7 @@ class Fp:
         r5, carry = mac(t5, k, MODULUS[5], carry)
         r6, r7 = adc(t6, 0, carry)
 
-        k = r1 * INV
+        k = wrapping_mul_u64(r1, INV)
         _, carry = mac(r1, k, MODULUS[0], 0)
         r2, carry = mac(r2, k, MODULUS[1], carry)
         r3, carry = mac(r3, k, MODULUS[2], carry)
@@ -62,7 +62,7 @@ class Fp:
         r6, carry = mac(r6, k, MODULUS[5], carry)
         r7, r8 = adc(t7, r7, carry)
 
-        k = r2 * INV
+        k = wrapping_mul_u64(r2, INV)
         _, carry = mac(r2, k, MODULUS[0], 0)
         r3, carry = mac(r3, k, MODULUS[1], carry)
         r4, carry = mac(r4, k, MODULUS[2], carry)
@@ -71,7 +71,7 @@ class Fp:
         r7, carry = mac(r7, k, MODULUS[5], carry)
         r8, r9 = adc(t8, r8, carry)
 
-        k = r3 * INV
+        k = wrapping_mul_u64(r3, INV)
         _, carry = mac(r3, k, MODULUS[0], 0)
         r4, carry = mac(r4, k, MODULUS[1], carry)
         r5, carry = mac(r5, k, MODULUS[2], carry)
@@ -80,7 +80,7 @@ class Fp:
         r8, carry = mac(r8, k, MODULUS[5], carry)
         r9, r10 = adc(t9, r9, carry)
 
-        k = r4 * INV
+        k = wrapping_mul_u64(r4, INV)
         _, carry = mac(r4, k, MODULUS[0], 0)
         r5, carry = mac(r5, k, MODULUS[1], carry)
         r6, carry = mac(r6, k, MODULUS[2], carry)
@@ -89,7 +89,7 @@ class Fp:
         r9, carry = mac(r9, k, MODULUS[5], carry)
         r10, r11 = adc(t10, r10, carry)
 
-        k = r5 * INV
+        k = wrapping_mul_u64(r5, INV)
         _, carry = mac(r5, k, MODULUS[0], 0)
         r6, carry = mac(r6, k, MODULUS[1], carry)
         r7, carry = mac(r7, k, MODULUS[2], carry)
@@ -154,7 +154,7 @@ class Fp:
         r2, borrow = sbb(self.array[2], MODULUS[2], borrow)
         r3, borrow = sbb(self.array[3], MODULUS[3], borrow)
         r4, borrow = sbb(self.array[4], MODULUS[4], borrow)
-        r5, _ = sbb(self.array[5], MODULUS[5], borrow)
+        r5, borrow = sbb(self.array[5], MODULUS[5], borrow)
 
         # If underflow occurred on the final limb, borrow = 0xfff...fff, otherwise
         # borrow = 0x000...000. Thus, we use it as a mask!
@@ -195,8 +195,6 @@ class Fp:
         tmp *= R2
 
         return CtOption(tmp, is_some)
-
-        return is_some
 
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787

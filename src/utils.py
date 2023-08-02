@@ -26,3 +26,7 @@ def mac(a, b, c, carry):
 def adc(a, b, carry):
     ret = a + b + carry
     return (ret & ((1 << 64) - 1), (ret >> 64) & ((1 << 64) - 1))
+
+
+def wrapping_mul_u64(a, b):
+    return (a * b) & ((1 << 64) - 1)
