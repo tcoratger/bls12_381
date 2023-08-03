@@ -224,7 +224,7 @@ class TestMontgomeryReduce(unittest.TestCase):
                 0xC80DAFCB56779679,
             ]
         )
-        self.assertEqual(Fp.montgomery_reduce(*t_values).array, expected_result.array)
+        self.assertTrue(Fp.montgomery_reduce(*t_values).eq(expected_result))
 
         # Test case 2
         t_values = [
@@ -252,7 +252,7 @@ class TestMontgomeryReduce(unittest.TestCase):
                 0x5024AE85084D9B0,
             ]
         )
-        self.assertEqual(Fp.montgomery_reduce(*t_values).array, expected_result.array)
+        self.assertTrue(Fp.montgomery_reduce(*t_values).eq(expected_result))
 
 
 if __name__ == "__main__":
