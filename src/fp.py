@@ -1,3 +1,4 @@
+from typing import List
 from src.utils import sbb, mac, adc, wrapping_mul_u64, wrapping_sub_u64
 
 
@@ -256,6 +257,50 @@ class Fp:
 
     def sub(self, rhs):
         return rhs.neg().add(self)
+
+    @staticmethod
+    def random(rng):
+        bytes = bytearray(rng.randint(0, 255) for _ in range(96))
+
+        # Parse the random bytes as a big-endian number, to match Fp encoding order.
+        limbs = [
+            int.from_bytes(bytes[0:8], byteorder="big"),
+            int.from_bytes(bytes[8:16], byteorder="big"),
+            int.from_bytes(bytes[16:24], byteorder="big"),
+            int.from_bytes(bytes[24:32], byteorder="big"),
+            int.from_bytes(bytes[32:40], byteorder="big"),
+            int.from_bytes(bytes[40:48], byteorder="big"),
+            int.from_bytes(bytes[48:56], byteorder="big"),
+            int.from_bytes(bytes[56:64], byteorder="big"),
+            int.from_bytes(bytes[64:72], byteorder="big"),
+            int.from_bytes(bytes[72:80], byteorder="big"),
+            int.from_bytes(bytes[80:88], byteorder="big"),
+            int.from_bytes(bytes[88:96], byteorder="big"),
+        ]
+
+        return Fp.from_u768(limbs)
+
+    @staticmethod
+    def from_u768(limbs: List[int]) -> "Fp":
+        # We reduce an arbitrary 768-bit number by decomposing it into two 384-bit digits
+        # with the higher bits multiplied by 2^384. Thus, we perform two reductions:
+        #
+        # 1. the lower bits are multiplied by R^2, as normal
+        # 2. the upper bits are multiplied by R^2 * 2^384 = R^3
+        #
+        # and computing their sum in the field. It remains to see that arbitrary 384-bit
+        # numbers can be placed into Montgomery form safely using the reduction. The
+        # reduction works as long as the product is less than R=2^384 multiplied by
+        # the modulus. This holds because for any `c` smaller than the modulus, we have
+        # that (2^384 - 1)*c is an acceptable product for the reduction. Therefore, the
+        # reduction always works as long as `c` is in the field; in this case, it is either the
+        # constant `R2` or `R3`.
+
+        d1 = Fp([limbs[11], limbs[10], limbs[9], limbs[8], limbs[7], limbs[6]])
+        d0 = Fp([limbs[5], limbs[4], limbs[3], limbs[2], limbs[1], limbs[0]])
+
+        # Convert to Montgomery form
+        return d0 * R2 + d1 * R3
 
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
