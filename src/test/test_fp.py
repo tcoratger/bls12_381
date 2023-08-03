@@ -102,6 +102,100 @@ class TestNeg(unittest.TestCase):
         self.assertTrue((-a).eq(b))
 
 
+class TestAdd(unittest.TestCase):
+    def test_addition(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        b = Fp(
+            [
+                0x9FD2_8773_3D23_DDA0,
+                0xB16B_F2AF_738B_3554,
+                0x3E57_A75B_D3CC_6D1D,
+                0x900B_C0BD_627F_D6D6,
+                0xD319_A080_EFB2_45FE,
+                0x15FD_CAA4_E4BB_2091,
+            ]
+        )
+        c = Fp(
+            [
+                0x3934_42CC_B58B_B327,
+                0x1092_685F_3BD5_47E3,
+                0x3382_252C_AB6A_C4C9,
+                0xF946_94CB_7688_7F55,
+                0x4B21_5E90_93A5_E071,
+                0x0D56_E30F_34F5_F853,
+            ]
+        )
+        self.assertTrue((a + b).eq(c))
+
+    def test_add_zero(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        self.assertTrue((a + Fp.zero()).eq(a))
+
+    def test_add_value_to_its_negation(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        self.assertTrue((a + (-a)).is_zero())
+
+    def test_negative_value_to_another_value(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        b = -Fp(
+            [
+                0x9FD2_8773_3D23_DDA0,
+                0xB16B_F2AF_738B_3554,
+                0x3E57_A75B_D3CC_6D1D,
+                0x900B_C0BD_627F_D6D6,
+                0xD319_A080_EFB2_45FE,
+                0x15FD_CAA4_E4BB_2091,
+            ]
+        )
+        c = Fp(
+            [
+                0x6D8D33E63B434D3D,
+                0xEB1282FDB766DD39,
+                0x85347BB6F133D6D5,
+                0xA21DAA5A9892F727,
+                0x3B256CFB3AD8AE23,
+                0x155D7199DE7F8464,
+            ]
+        )
+        self.assertTrue((a + b).eq(c))
+
+
 class TestMontgomeryReduce(unittest.TestCase):
     # Test Montgomery Reduction
     def test_montgomery_reduce(self):

@@ -14,6 +14,9 @@ class Fp:
     def __mul__(self, other):
         return self.mul(other)
 
+    def __add__(self, other):
+        return self.add(other)
+
     def __neg__(self):
         return self.neg()
 
@@ -237,6 +240,16 @@ class Fp:
                 d5 & mask,
             ]
         )
+
+    def add(self, rhs):
+        d0, carry = adc(self.array[0], rhs.array[0], 0)
+        d1, carry = adc(self.array[1], rhs.array[1], carry)
+        d2, carry = adc(self.array[2], rhs.array[2], carry)
+        d3, carry = adc(self.array[3], rhs.array[3], carry)
+        d4, carry = adc(self.array[4], rhs.array[4], carry)
+        d5, _ = adc(self.array[5], rhs.array[5], carry)
+
+        return Fp([d0, d1, d2, d3, d4, d5]).subtract_p()
 
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
