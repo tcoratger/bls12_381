@@ -196,6 +196,100 @@ class TestAdd(unittest.TestCase):
         self.assertTrue((a + b).eq(c))
 
 
+class TestSub(unittest.TestCase):
+    def test_subtraction(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        b = Fp(
+            [
+                0x9FD2_8773_3D23_DDA0,
+                0xB16B_F2AF_738B_3554,
+                0x3E57_A75B_D3CC_6D1D,
+                0x900B_C0BD_627F_D6D6,
+                0xD319_A080_EFB2_45FE,
+                0x15FD_CAA4_E4BB_2091,
+            ]
+        )
+        c = Fp(
+            [
+                0x6D8D_33E6_3B43_4D3D,
+                0xEB12_82FD_B766_DD39,
+                0x8534_7BB6_F133_D6D5,
+                0xA21D_AA5A_9892_F727,
+                0x3B25_6CFB_3AD8_AE23,
+                0x155D_7199_DE7F_8464,
+            ]
+        )
+        self.assertTrue((a - b).eq(c))
+
+    def test_subtraction_zero(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        self.assertTrue((a - Fp.zero()).eq(a))
+
+    def test_subtract_value_from_itself(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        self.assertTrue((a - a).is_zero())
+
+    def test_subtract_negative_value(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        b = -Fp(
+            [
+                0x9FD2_8773_3D23_DDA0,
+                0xB16B_F2AF_738B_3554,
+                0x3E57_A75B_D3CC_6D1D,
+                0x900B_C0BD_627F_D6D6,
+                0xD319_A080_EFB2_45FE,
+                0x15FD_CAA4_E4BB_2091,
+            ]
+        )
+        c = Fp(
+            [
+                0x393442CCB58BB327,
+                0x1092685F3BD547E3,
+                0x3382252CAB6AC4C9,
+                0xF94694CB76887F55,
+                0x4B215E9093A5E071,
+                0xD56E30F34F5F853,
+            ]
+        )
+        self.assertTrue((a - b).eq(c))
+
+
 class TestMontgomeryReduce(unittest.TestCase):
     # Test Montgomery Reduction
     def test_montgomery_reduce(self):

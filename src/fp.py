@@ -17,6 +17,9 @@ class Fp:
     def __add__(self, other):
         return self.add(other)
 
+    def __sub__(self, other):
+        return self.sub(other)
+
     def __neg__(self):
         return self.neg()
 
@@ -250,6 +253,9 @@ class Fp:
         d5, _ = adc(self.array[5], rhs.array[5], carry)
 
         return Fp([d0, d1, d2, d3, d4, d5]).subtract_p()
+
+    def sub(self, rhs):
+        return rhs.neg().add(self)
 
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
