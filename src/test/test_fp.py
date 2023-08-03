@@ -37,6 +37,71 @@ class TestFp(unittest.TestCase):
         self.assertTrue(fp1.neq(fp3))
 
 
+class TestNeg(unittest.TestCase):
+    def test_negation(self):
+        a = Fp(
+            [
+                0x5360_BB59_7867_8032,
+                0x7DD2_75AE_799E_128E,
+                0x5C5B_5071_CE4F_4DCF,
+                0xCDB2_1F93_078D_BB3E,
+                0xC323_65C5_E73F_474A,
+                0x115A_2A54_89BA_BE5B,
+            ]
+        )
+        b = Fp(
+            [
+                0x669E_44A6_8798_2A79,
+                0xA0D9_8A50_37B5_ED71,
+                0x0AD5_822F_2861_A854,
+                0x96C5_2BF1_EBF7_5781,
+                0x87F8_41F0_5C0C_658C,
+                0x08A6_E795_AFC5_283E,
+            ]
+        )
+        self.assertTrue((-a).eq(b))
+
+    def test_negation_with_zero(self):
+        self.assertTrue(-Fp.zero().is_zero())
+
+    def test_negation_with_max_value(self):
+        a = Fp(
+            [
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+            ]
+        )
+        b = Fp(
+            [
+                0xB9FEFFFFFFFFAAAC,
+                0x1EABFFFEB153FFFF,
+                0x6730D2A0F6B0F624,
+                0x64774B84F38512BF,
+                0x4B1BA7B6434BACD7,
+                0x1A0111EA397FE69A,
+            ]
+        )
+        self.assertTrue((-a).eq(b))
+
+    def test_negation_with_small_value(self):
+        a = Fp([1, 2, 3, 4, 5, 6])
+        b = Fp(
+            [
+                0xB9FEFFFFFFFFAAAA,
+                0x1EABFFFEB153FFFD,
+                0x6730D2A0F6B0F621,
+                0x64774B84F38512BB,
+                0x4B1BA7B6434BACD2,
+                0x1A0111EA397FE694,
+            ]
+        )
+        self.assertTrue((-a).eq(b))
+
+
 class TestMontgomeryReduce(unittest.TestCase):
     # Test Montgomery Reduction
     def test_montgomery_reduce(self):

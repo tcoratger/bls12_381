@@ -71,3 +71,7 @@ def wrapping_mul_u64(a, b):
     unsigned integer range.
     """
     return (a * b) & ((1 << 64) - 1)
+
+
+def wrapping_sub_u64(a, b):
+    return (a - b) & ((1 << 64) - 1)

@@ -1,4 +1,4 @@
-from src.utils import sbb, mac, adc, wrapping_mul_u64
+from src.utils import sbb, mac, adc, wrapping_mul_u64, wrapping_sub_u64
 
 
 class CtOption:
@@ -10,6 +10,12 @@ class CtOption:
 class Fp:
     def __init__(self, array):
         self.array = array
+
+    def __mul__(self, other):
+        return self.mul(other)
+
+    def __neg__(self):
+        return self.neg()
 
     @staticmethod
     def zero():
@@ -145,9 +151,6 @@ class Fp:
 
         return Fp.montgomery_reduce(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)
 
-    def __mul__(self, other):
-        return self.mul(other)
-
     def subtract_p(self):
         r0, borrow = sbb(self.array[0], MODULUS[0], 0)
         r1, borrow = sbb(self.array[1], MODULUS[1], borrow)
@@ -195,6 +198,45 @@ class Fp:
         tmp *= R2
 
         return CtOption(tmp, is_some)
+
+    def neg(self):
+        d0, borrow = sbb(MODULUS[0], self.array[0], 0)
+        d1, borrow = sbb(MODULUS[1], self.array[1], borrow)
+        d2, borrow = sbb(MODULUS[2], self.array[2], borrow)
+        d3, borrow = sbb(MODULUS[3], self.array[3], borrow)
+        d4, borrow = sbb(MODULUS[4], self.array[4], borrow)
+        d5, _ = sbb(MODULUS[5], self.array[5], borrow)
+
+        # Let's use a mask if `self` was zero, which would mean
+        # the result of the subtraction is p.
+        mask = wrapping_sub_u64(
+            int(
+                (
+                    (
+                        self.array[0]
+                        | self.array[1]
+                        | self.array[2]
+                        | self.array[3]
+                        | self.array[4]
+                        | self.array[5]
+                    )
+                    == 0
+                )
+            )
+            & ((1 << 64) - 1),
+            1,
+        )
+
+        return Fp(
+            [
+                d0 & mask,
+                d1 & mask,
+                d2 & mask,
+                d3 & mask,
+                d4 & mask,
+                d5 & mask,
+            ]
+        )
 
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
