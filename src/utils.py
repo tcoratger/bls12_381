@@ -74,4 +74,13 @@ def wrapping_mul_u64(a, b):
 
 
 def wrapping_sub_u64(a, b):
+    """
+    The function `wrapping_sub_u64` calculates the difference between two unsigned 64-bit integers,
+    wrapping around if the result is negative.
+
+    :param a: The parameter "a" is a 64-bit unsigned integer
+    :param b: The parameter "b" is a 64-bit unsigned integer
+    :return: The function `wrapping_sub_u64` returns the result of subtracting `b` from `a` and then
+    performing a bitwise AND operation with the value `(1 << 64) - 1`.
+    """
     return (a - b) & ((1 << 64) - 1)
