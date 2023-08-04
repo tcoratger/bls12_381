@@ -352,6 +352,34 @@ class Fp:
         # Perform Montgomery reduction
         return Fp.montgomery_reduce(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)
 
+    def pow_vartime(self, by):
+        res = Fp.one()
+
+        for e in reversed(by):
+            for i in reversed(range(64)):
+                res = res.square()
+
+                if (e >> i) & 1 == 1:
+                    res *= self
+
+            # Call the Montgomery reduction function here if needed
+            # (montgomery_reduce(res.array[0], res.array[1], ...))
+
+        return res
+
+    def sqrt(self):
+        sqrt = self.pow_vartime(
+            [
+                0xEE7F_BFFF_FFFF_EAAB,
+                0x07AA_FFFF_AC54_FFFF,
+                0xD9CC_34A8_3DAC_3D89,
+                0xD91D_D2E1_3CE1_44AF,
+                0x92C6_E9ED_90D2_EB35,
+                0x0680_447A_8E5F_F9A6,
+            ]
+        )
+        return CtOption(sqrt, sqrt.square().eq(self))
+
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
 MODULUS = [

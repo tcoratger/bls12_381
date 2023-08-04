@@ -429,5 +429,31 @@ class TestSquare(unittest.TestCase):
         self.assertTrue(large.square().eq(expected_large_square))
 
 
+class TestSqrt(unittest.TestCase):
+    def test_sqrt(self):
+        a = Fp(
+            [
+                0xAA27_0000_000C_FFF3,
+                0x53CC_0032_FC34_000A,
+                0x478F_E97A_6B0A_807F,
+                0xB1D3_7EBE_E6BA_24D7,
+                0x8EC9_733B_BF78_AB2F,
+                0x09D6_4551_3D83_DE7E,
+            ]
+        )
+        b = Fp(
+            [
+                0x3213_0000_0006_554F,
+                0xB93C_0018_D6C4_0005,
+                0x5760_5E0D_B0DD_BB51,
+                0x8B25_6521_ED1F_9BCB,
+                0x6CF2_8D79_0162_2C03,
+                0x11EB_AB9D_BB81_E28C,
+            ]
+        )
+        result = a.sqrt()
+        self.assertTrue((-(result.value)).eq(b) and result.choice)
+
+
 if __name__ == "__main__":
     unittest.main()
