@@ -20,21 +20,31 @@ class TestFp(unittest.TestCase):
             ).is_zero()
         )
 
+
+class TestFpEq(unittest.TestCase):
     def test_eq(self):
         fp1 = Fp([1, 2, 3, 4, 5, 6])
-        fp2 = Fp([1, 2, 3, 4, 5, 6])
-        fp3 = Fp([6, 5, 4, 3, 2, 1])
 
-        self.assertTrue(fp1.eq(fp2))
-        self.assertFalse(fp1.eq(fp3))
+        self.assertTrue(fp1.eq(fp1))
+        self.assertFalse(fp1.eq(Fp([7, 2, 3, 4, 5, 6])))
+        self.assertFalse(fp1.eq(Fp([1, 7, 3, 4, 5, 6])))
+        self.assertFalse(fp1.eq(Fp([1, 2, 7, 4, 5, 6])))
+        self.assertFalse(fp1.eq(Fp([1, 2, 3, 7, 5, 6])))
+        self.assertFalse(fp1.eq(Fp([1, 2, 3, 4, 7, 6])))
+        self.assertFalse(fp1.eq(Fp([1, 2, 3, 4, 5, 7])))
 
+
+class TestFpNeq(unittest.TestCase):
     def test_neq(self):
         fp1 = Fp([1, 2, 3, 4, 5, 6])
-        fp2 = Fp([1, 2, 3, 4, 5, 6])
-        fp3 = Fp([6, 5, 4, 3, 2, 1])
 
-        self.assertFalse(fp1.neq(fp2))
-        self.assertTrue(fp1.neq(fp3))
+        self.assertFalse(fp1.neq(fp1))
+        self.assertTrue(fp1.neq(Fp([7, 2, 3, 4, 5, 6])))
+        self.assertTrue(fp1.neq(Fp([1, 7, 3, 4, 5, 6])))
+        self.assertTrue(fp1.neq(Fp([1, 2, 7, 4, 5, 6])))
+        self.assertTrue(fp1.neq(Fp([1, 2, 3, 7, 5, 6])))
+        self.assertTrue(fp1.neq(Fp([1, 2, 3, 4, 7, 6])))
+        self.assertTrue(fp1.neq(Fp([1, 2, 3, 4, 5, 7])))
 
 
 class TestNeg(unittest.TestCase):
