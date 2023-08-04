@@ -359,5 +359,75 @@ class TestMontgomeryReduce(unittest.TestCase):
         self.assertTrue(Fp.montgomery_reduce(*t_values).eq(expected_result))
 
 
+class TestSquare(unittest.TestCase):
+    def test_squaring(self):
+        a = Fp(
+            [
+                0xD215_D276_8E83_191B,
+                0x5085_D80F_8FB2_8261,
+                0xCE9A_032D_DF39_3A56,
+                0x3E9C_4FFF_2CA0_C4BB,
+                0x6436_B6F7_F4D9_5DFB,
+                0x1060_6628_AD4A_4D90,
+            ]
+        )
+        b = Fp(
+            [
+                0x33D9_C42A_3CB3_E235,
+                0xDAD1_1A09_4C4C_D455,
+                0xA2F1_44BD_729A_AEBA,
+                0xD415_0932_BE9F_FEAC,
+                0xE27B_C7C4_7D44_EE50,
+                0x14B6_A78D_3EC7_A560,
+            ]
+        )
+
+        self.assertTrue(a.square().eq(b))
+
+    def test_squaring_with_zeros(self):
+        self.assertTrue(Fp.zero().square().eq(Fp.zero()))
+
+    def test_squaring_with_ones(self):
+        one = Fp([1, 0, 0, 0, 0, 0])
+        b = Fp(
+            [
+                0xF4D38259380B4820,
+                0x7FE11274D898FAFB,
+                0x343EA97914956DC8,
+                0x1797AB1458A88DE9,
+                0xED5E64273C4F538B,
+                0x14FEC701E8FB0CE9,
+            ]
+        )
+        self.assertTrue(one.square().eq(b))
+
+    def test_squaring_with_negative_numbers(self):
+        a = Fp(
+            [
+                0xD215_D276_8E83_191B,
+                0x5085_D80F_8FB2_8261,
+                0xCE9A_032D_DF39_3A56,
+                0x3E9C_4FFF_2CA0_C4BB,
+                0x6436_B6F7_F4D9_5DFB,
+                0x1060_6628_AD4A_4D90,
+            ]
+        )
+        self.assertTrue((-a).square().eq(a.square()))
+
+    def test_squaring_with_large_numbers(self):
+        large = Fp(
+            [
+                0xFFFFFFFFFFFFFFFF,
+                0xFFFFFFFFFFFFFFFF,
+                0xFFFFFFFFFFFFFFFF,
+                0xFFFFFFFFFFFFFFFF,
+                0xFFFFFFFFFFFFFFFF,
+                0xFFFFFFFFFFFFFFFF,
+            ]
+        )
+        expected_large_square = large * large
+        self.assertTrue(large.square().eq(expected_large_square))
+
+
 if __name__ == "__main__":
     unittest.main()

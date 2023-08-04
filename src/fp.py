@@ -302,6 +302,56 @@ class Fp:
         # Convert to Montgomery form
         return d0 * R2 + d1 * R3
 
+    def square(self):
+        # Perform the square operation
+        t1, carry = mac(0, self.array[0], self.array[1], 0)
+        t2, carry = mac(0, self.array[0], self.array[2], carry)
+        t3, carry = mac(0, self.array[0], self.array[3], carry)
+        t4, carry = mac(0, self.array[0], self.array[4], carry)
+        t5, t6 = mac(0, self.array[0], self.array[5], carry)
+
+        t3, carry = mac(t3, self.array[1], self.array[2], 0)
+        t4, carry = mac(t4, self.array[1], self.array[3], carry)
+        t5, carry = mac(t5, self.array[1], self.array[4], carry)
+        t6, t7 = mac(t6, self.array[1], self.array[5], carry)
+
+        t5, carry = mac(t5, self.array[2], self.array[3], 0)
+        t6, carry = mac(t6, self.array[2], self.array[4], carry)
+        t7, t8 = mac(t7, self.array[2], self.array[5], carry)
+
+        t7, carry = mac(t7, self.array[3], self.array[4], 0)
+        t8, t9 = mac(t8, self.array[3], self.array[5], carry)
+
+        t9, t10 = mac(t9, self.array[4], self.array[5], 0)
+
+        t11 = t10 >> 63 & ((1 << 64) - 1)
+        t10 = (t10 << 1) & ((1 << 64) - 1) | (t9 >> 63) & ((1 << 64) - 1)
+        t9 = (t9 << 1) & ((1 << 64) - 1) | (t8 >> 63) & ((1 << 64) - 1)
+        t8 = (t8 << 1) & ((1 << 64) - 1) | (t7 >> 63) & ((1 << 64) - 1)
+        t7 = (t7 << 1) & ((1 << 64) - 1) | (t6 >> 63) & ((1 << 64) - 1)
+        t6 = (t6 << 1) & ((1 << 64) - 1) | (t5 >> 63) & ((1 << 64) - 1)
+        t5 = (t5 << 1) & ((1 << 64) - 1) | (t4 >> 63) & ((1 << 64) - 1)
+        t4 = (t4 << 1) & ((1 << 64) - 1) | (t3 >> 63) & ((1 << 64) - 1)
+        t3 = (t3 << 1) & ((1 << 64) - 1) | (t2 >> 63) & ((1 << 64) - 1)
+        t2 = (t2 << 1) & ((1 << 64) - 1) | (t1 >> 63) & ((1 << 64) - 1)
+        t1 = t1 << 1 & ((1 << 64) - 1)
+
+        t0, carry = mac(0, self.array[0], self.array[0], 0)
+        t1, carry = adc(t1, 0, carry)
+        t2, carry = mac(t2, self.array[1], self.array[1], carry)
+        t3, carry = adc(t3, 0, carry)
+        t4, carry = mac(t4, self.array[2], self.array[2], carry)
+        t5, carry = adc(t5, 0, carry)
+        t6, carry = mac(t6, self.array[3], self.array[3], carry)
+        t7, carry = adc(t7, 0, carry)
+        t8, carry = mac(t8, self.array[4], self.array[4], carry)
+        t9, carry = adc(t9, 0, carry)
+        t10, carry = mac(t10, self.array[5], self.array[5], carry)
+        t11, _ = adc(t11, 0, carry)
+
+        # Perform Montgomery reduction
+        return Fp.montgomery_reduce(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)
+
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
 MODULUS = [
