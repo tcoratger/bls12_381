@@ -481,5 +481,118 @@ class TestInvert(unittest.TestCase):
         self.assertTrue(result.value.eq(b) and result.choice)
 
 
+class TestFromBytes(unittest.TestCase):
+    def test_from_bytes(self):
+        result = Fp.from_bytes(
+            [
+                26,
+                1,
+                17,
+                234,
+                57,
+                127,
+                230,
+                154,
+                75,
+                27,
+                167,
+                182,
+                67,
+                75,
+                172,
+                215,
+                100,
+                119,
+                75,
+                132,
+                243,
+                133,
+                18,
+                191,
+                103,
+                48,
+                210,
+                160,
+                246,
+                176,
+                246,
+                36,
+                30,
+                171,
+                255,
+                254,
+                177,
+                83,
+                255,
+                255,
+                185,
+                254,
+                255,
+                255,
+                255,
+                255,
+                170,
+                170,
+            ]
+        )
+        self.assertTrue((-Fp.one()).eq(result.value) and result.choice)
+
+    def test_from_bytes_false(self):
+        result = Fp.from_bytes(
+            [
+                27,
+                1,
+                17,
+                234,
+                57,
+                127,
+                230,
+                154,
+                75,
+                27,
+                167,
+                182,
+                67,
+                75,
+                172,
+                215,
+                100,
+                119,
+                75,
+                132,
+                243,
+                133,
+                18,
+                191,
+                103,
+                48,
+                210,
+                160,
+                246,
+                176,
+                246,
+                36,
+                30,
+                171,
+                255,
+                254,
+                177,
+                83,
+                255,
+                255,
+                185,
+                254,
+                255,
+                255,
+                255,
+                255,
+                170,
+                170,
+            ]
+        )
+
+        self.assertFalse(result.choice)
+
+
 if __name__ == "__main__":
     unittest.main()
