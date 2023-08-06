@@ -455,5 +455,31 @@ class TestSqrt(unittest.TestCase):
         self.assertTrue((-(result.value)).eq(b) and result.choice)
 
 
+class TestInvert(unittest.TestCase):
+    def test_inversion(self):
+        a = Fp(
+            [
+                0x43B4_3A50_78AC_2076,
+                0x1CE0_7630_46F8_962B,
+                0x724A_5276_486D_735C,
+                0x6F05_C2A6_282D_48FD,
+                0x2095_BD5B_B4CA_9331,
+                0x03B3_5B38_94B0_F7DA,
+            ]
+        )
+        b = Fp(
+            [
+                0x69EC_D704_0952_148F,
+                0x985C_CC20_2219_0F55,
+                0xE19B_BA36_A9AD_2F41,
+                0x19BB_16C9_5219_DBD8,
+                0x14DC_ACFD_FB47_8693,
+                0x115F_F58A_FFF9_A8E1,
+            ]
+        )
+        result = a.invert()
+        self.assertTrue(result.value.eq(b) and result.choice)
+
+
 if __name__ == "__main__":
     unittest.main()

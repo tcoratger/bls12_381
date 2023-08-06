@@ -368,6 +368,10 @@ class Fp:
         return res
 
     def sqrt(self):
+        # We use Shank's method, as p = 3 (mod 4). This means
+        # we only need to exponentiate by (p+1)/4. This only
+        # works for elements that are actually quadratic residue,
+        # so we check that we got the correct result at the end.
         sqrt = self.pow_vartime(
             [
                 0xEE7F_BFFF_FFFF_EAAB,
@@ -379,6 +383,20 @@ class Fp:
             ]
         )
         return CtOption(sqrt, sqrt.square().eq(self))
+
+    def invert(self):
+        # Exponentiate by p - 2
+        t = self.pow_vartime(
+            [
+                0xB9FE_FFFF_FFFF_AAA9,
+                0x1EAB_FFFE_B153_FFFF,
+                0x6730_D2A0_F6B0_F624,
+                0x6477_4B84_F385_12BF,
+                0x4B1B_A7B6_434B_ACD7,
+                0x1A01_11EA_397F_E69A,
+            ]
+        )
+        return CtOption(t, not self.is_zero())
 
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
