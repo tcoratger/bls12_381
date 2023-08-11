@@ -594,5 +594,82 @@ class TestFromBytes(unittest.TestCase):
         self.assertFalse(result.choice)
 
 
+class TestSumOfProducts(unittest.TestCase):
+    def test_sum_of_products(self):
+        a = Fp(
+            [
+                0x0397_A383_2017_0CD4,
+                0x734C_1B2C_9E76_1D30,
+                0x5ED2_55AD_9A48_BEB5,
+                0x095A_3C6B_22A7_FCFC,
+                0x2294_CE75_D4E2_6A27,
+                0x1333_8BD8_7001_1EBB,
+            ]
+        )
+        b = Fp(
+            [
+                0xB9C3_C7C5_B119_6AF7,
+                0x2580_E208_6CE3_35C1,
+                0xF49A_ED3D_8A57_EF42,
+                0x41F2_81E4_9846_E878,
+                0xE076_2346_C384_52CE,
+                0x0652_E893_26E5_7DC0,
+            ]
+        )
+        c = Fp(
+            [
+                0xF96E_F3D7_11AB_5355,
+                0xE8D4_59EA_00F1_48DD,
+                0x53F7_354A_5F00_FA78,
+                0x9E34_A4F3_125C_5F83,
+                0x3FBE_0C47_CA74_C19E,
+                0x01B0_6A8B_BD4A_DFE4,
+            ]
+        )
+
+        d = Fp(
+            [
+                0x5D384814D7EF6DF9,
+                0x8B5477811C388449,
+                0x32DDEA5F318D6A48,
+                0x36E9DABCD700040E,
+                0xC47BD694ABAB714E,
+                0xA838DFE8CBCECD6,
+            ]
+        )
+
+        self.assertTrue(Fp.sum_of_products([a, b], [a, c]).eq(d))
+
+    def test_sum_of_products_not_same_length(self):
+        a = Fp(
+            [
+                0x0397_A383_2017_0CD4,
+                0x734C_1B2C_9E76_1D30,
+                0x5ED2_55AD_9A48_BEB5,
+                0x095A_3C6B_22A7_FCFC,
+                0x2294_CE75_D4E2_6A27,
+                0x1333_8BD8_7001_1EBB,
+            ]
+        )
+        b = Fp(
+            [
+                0xB9C3_C7C5_B119_6AF7,
+                0x2580_E208_6CE3_35C1,
+                0xF49A_ED3D_8A57_EF42,
+                0x41F2_81E4_9846_E878,
+                0xE076_2346_C384_52CE,
+                0x0652_E893_26E5_7DC0,
+            ]
+        )
+
+        with self.assertRaises(ValueError) as context:
+            Fp.sum_of_products([a, b], [a])
+
+        self.assertEqual(
+            str(context.exception),
+            "Input lists must have the same length",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

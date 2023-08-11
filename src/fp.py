@@ -398,6 +398,32 @@ class Fp:
         )
         return CtOption(t, not self.is_zero())
 
+    def sum_of_products(a, b):
+        if len(a) != len(b):
+            raise ValueError("Input lists must have the same length")
+        acc_u = [0, 0, 0, 0, 0, 0]
+        for j in range(6):
+            acc_t = [acc_u[0], acc_u[1], acc_u[2], acc_u[3], acc_u[4], acc_u[5], 0]
+            for i in range(len(a)):
+                acc_t[0], carry = mac(acc_t[0], a[i].array[j], b[i].array[0], 0)
+                acc_t[1], carry = mac(acc_t[1], a[i].array[j], b[i].array[1], carry)
+                acc_t[2], carry = mac(acc_t[2], a[i].array[j], b[i].array[2], carry)
+                acc_t[3], carry = mac(acc_t[3], a[i].array[j], b[i].array[3], carry)
+                acc_t[4], carry = mac(acc_t[4], a[i].array[j], b[i].array[4], carry)
+                acc_t[5], carry = mac(acc_t[5], a[i].array[j], b[i].array[5], carry)
+                acc_t[6], _ = adc(acc_t[6], 0, carry)
+
+            k = wrapping_mul_u64(acc_t[0], INV)
+            _, carry = mac(acc_t[0], k, MODULUS[0], 0)
+            acc_u[0], carry = mac(acc_t[1], k, MODULUS[1], carry)
+            acc_u[1], carry = mac(acc_t[2], k, MODULUS[2], carry)
+            acc_u[2], carry = mac(acc_t[3], k, MODULUS[3], carry)
+            acc_u[3], carry = mac(acc_t[4], k, MODULUS[4], carry)
+            acc_u[4], carry = mac(acc_t[5], k, MODULUS[5], carry)
+            acc_u[5], _ = adc(acc_t[6], 0, carry)
+
+        return Fp(acc_u).subtract_p()
+
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
 MODULUS = [
