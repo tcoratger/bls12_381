@@ -11,6 +11,9 @@ class Fp2:
     def zero():
         return Fp2(Fp.zero(), Fp.zero())
 
+    def is_zero(self):
+        return self.c0.is_zero() and self.c1.is_zero()
+
     @staticmethod
     def default():
         return Fp2.zero()
