@@ -719,5 +719,24 @@ class TestLexicographicallyLargest(unittest.TestCase):
         )
 
 
+class TestToBytes(unittest.TestCase):
+    def test_to_bytes(self):
+        a = Fp(
+            [
+                0xDC90_6D9B_E3F9_5DC8,
+                0x8755_CAF7_4596_91A1,
+                0xCFF1_A7F4_E958_3AB3,
+                0x9B43_821F_849E_2284,
+                0xF575_54F3_A297_4F3F,
+                0x085D_BEA8_4ED4_7F79,
+            ]
+        )
+        for _ in range(100):
+            a = a.square()
+            tmp = a.to_bytes()
+            b = Fp.from_bytes(tmp)
+            self.assertTrue(a.eq(b.value) and b.choice)
+
+
 if __name__ == "__main__":
     unittest.main()

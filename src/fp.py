@@ -177,6 +177,36 @@ class Fp:
 
         return Fp([r0, r1, r2, r3, r4, r5])
 
+    # Converts an element of `Fp` into a byte representation in
+    # big-endian byte order.
+    def to_bytes(self):
+        # Turn into canonical form by computing
+        # (a.R) / R = a
+        tmp = Fp.montgomery_reduce(
+            self.array[0],
+            self.array[1],
+            self.array[2],
+            self.array[3],
+            self.array[4],
+            self.array[5],
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        )
+
+        res = bytearray(48)
+        res[0:8] = tmp.array[5].to_bytes(8, "big")
+        res[8:16] = tmp.array[4].to_bytes(8, "big")
+        res[16:24] = tmp.array[3].to_bytes(8, "big")
+        res[24:32] = tmp.array[2].to_bytes(8, "big")
+        res[32:40] = tmp.array[1].to_bytes(8, "big")
+        res[40:48] = tmp.array[0].to_bytes(8, "big")
+
+        return bytes(res)
+
     def from_bytes(bytes):
         tmp = Fp([0, 0, 0, 0, 0, 0])
 
