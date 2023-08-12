@@ -17,3 +17,6 @@ class Fp2:
     @staticmethod
     def default():
         return Fp2.zero()
+
+    def conjugate(self):
+        return Fp2(self.c0, -self.c1)
