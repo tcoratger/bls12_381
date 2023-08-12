@@ -671,5 +671,53 @@ class TestSumOfProducts(unittest.TestCase):
         )
 
 
+class TestLexicographicallyLargest(unittest.TestCase):
+    def test_lexicographic_largest_zero(self):
+        self.assertFalse(Fp.zero().lexicographically_largest())
+
+    def test_lexicographic_largest_one(self):
+        self.assertFalse(Fp.one().lexicographically_largest())
+
+    def test_lexicographic_largest(self):
+        self.assertFalse(
+            Fp(
+                [
+                    0xA1FA_FFFF_FFFE_5557,
+                    0x995B_FFF9_76A3_FFFE,
+                    0x03F4_1D24_D174_CEB4,
+                    0xF654_7998_C199_5DBD,
+                    0x778A_468F_507A_6034,
+                    0x0205_5993_1F7F_8103,
+                ]
+            ).lexicographically_largest()
+        )
+
+        self.assertTrue(
+            Fp(
+                [
+                    0x1804_0000_0001_5554,
+                    0x8550_0005_3AB0_0001,
+                    0x633C_B57C_253C_276F,
+                    0x6E22_D1EC_31EB_B502,
+                    0xD391_6126_F2D1_4CA2,
+                    0x17FB_B857_1A00_6596,
+                ]
+            ).lexicographically_largest()
+        )
+
+        self.assertTrue(
+            Fp(
+                [
+                    0x43F5_FFFF_FFFC_AAAE,
+                    0x32B7_FFF2_ED47_FFFD,
+                    0x07E8_3A49_A2E9_9D69,
+                    0xECA8_F331_8332_BB7A,
+                    0xEF14_8D1E_A0F4_C069,
+                    0x040A_B326_3EFF_0206,
+                ]
+            ).lexicographically_largest()
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

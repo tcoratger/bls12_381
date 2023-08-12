@@ -424,6 +424,45 @@ class Fp:
 
         return Fp(acc_u).subtract_p()
 
+    # Returns whether or not this element is strictly lexicographically
+    # larger than its negation.
+    def lexicographically_largest(self):
+        # This can be determined by checking to see if the element is
+        # larger than (p - 1) // 2. If we subtract by ((p - 1) // 2) + 1
+        # and there is no underflow, then the element must be larger than
+        # (p - 1) // 2.
+
+        # First, because self is in Montgomery form we need to reduce it
+        tmp = Fp.montgomery_reduce(
+            self.array[0],
+            self.array[1],
+            self.array[2],
+            self.array[3],
+            self.array[4],
+            self.array[5],
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        )
+
+        # Subtraction and underflow checks
+        _, borrow = sbb(tmp.array[0], 0xDCFF_7FFF_FFFF_D556, 0)
+        _, borrow = sbb(tmp.array[1], 0x0F55_FFFF_58A9_FFFF, borrow)
+        _, borrow = sbb(tmp.array[2], 0xB398_6950_7B58_7B12, borrow)
+        _, borrow = sbb(tmp.array[3], 0xB23B_A5C2_79C2_895F, borrow)
+        _, borrow = sbb(tmp.array[4], 0x258D_D3DB_21A5_D66B, borrow)
+        _, borrow = sbb(tmp.array[5], 0x0D00_88F5_1CBF_F34D, borrow)
+
+        # If the element was smaller, the subtraction will underflow
+        # producing a borrow value of 0xffff...ffff, otherwise it will
+        # be zero. We create a Choice representing true if there was
+        # overflow (and so this element is not lexicographically larger
+        # than its negation) and then negate it.
+        return not ((borrow & ((1 << 8) - 1)) & 1)
+
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787
 MODULUS = [
