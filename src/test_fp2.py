@@ -205,27 +205,48 @@ class TestNeg(unittest.TestCase):
         a = Fp2(
             Fp(
                 [
-                    0x1128_ECAD_6754_9455,
-                    0x9E7A_1CFF_3A4E_A1A8,
-                    0xEB20_8D51_E08B_CF27,
-                    0xE98A_D408_11F5_FC2B,
-                    0x736C_3A59_232D_511D,
-                    0x10AC_D42D_29CF_CBB6,
+                    0xC9A2_1831_63EE_70D4,
+                    0xBC37_70A7_196B_5C91,
+                    0xA247_F8C1_304C_5F44,
+                    0xB01F_C2A3_726C_80B5,
+                    0xE1D2_93E5_BBD9_19C9,
+                    0x04B7_8E80_020E_F2CA,
                 ]
             ),
             Fp(
                 [
-                    0xD328_E37C_C2F5_8D41,
-                    0x948D_F085_8A60_5869,
-                    0x6032_F9D5_6F93_A573,
-                    0x2BE4_83EF_3FFF_DC87,
-                    0x30EF_61F8_8F48_3C2A,
-                    0x1333_F55A_3572_5BE0,
+                    0x952E_A446_0462_618F,
+                    0x238D_5EDD_F025_C62F,
+                    0xF6C9_4B01_2EA9_2E72,
+                    0x03CE_24EA_C1C9_3808,
+                    0x0559_50F9_45DA_483C,
+                    0x010A_768D_0DF4_EABC,
                 ]
             ),
         )
-        b = -a
-        self.assertTrue(b.c0.eq(-(a.c0)) and b.c1.eq(-(a.c1)))
+        b = Fp2(
+            Fp(
+                [
+                    0xF05C_E7CE_9C11_39D7,
+                    0x6274_8F57_97E8_A36D,
+                    0xC4E8_D9DF_C664_96DF,
+                    0xB457_88E1_8118_9209,
+                    0x6949_13D0_8772_930D,
+                    0x1549_836A_3770_F3CF,
+                ]
+            ),
+            Fp(
+                [
+                    0x24D0_5BB9_FB9D_491C,
+                    0xFB1E_A120_C12E_39D0,
+                    0x7067_879F_C807_C7B1,
+                    0x60A9_269A_31BB_DAB6,
+                    0x45C2_56BC_FD71_649B,
+                    0x18F6_9B5D_2B8A_FBDE,
+                ]
+            ),
+        )
+        self.assertTrue((-a).eq(b))
 
 
 class TestSub(unittest.TestCase):
