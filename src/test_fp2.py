@@ -48,7 +48,7 @@ class TestEq(unittest.TestCase):
 class TestDefault(unittest.TestCase):
     def test_default(self):
         a = Fp2.default()
-        self.assertTrue(a.c0.eq(Fp.zero()) and a.c1.eq(Fp.zero()))
+        self.assertTrue(a.eq(Fp2.zero()))
 
 
 class TestIsZero(unittest.TestCase):
@@ -86,7 +86,7 @@ class TestConjugate(unittest.TestCase):
     def test_conjugate_zero(self):
         a = Fp2(Fp.zero(), Fp.zero())
         b = a.conjugate()
-        self.assertTrue(b.c0.eq(Fp.zero()) and b.c1.eq(Fp.zero()))
+        self.assertTrue(b.eq(Fp2.zero()))
 
 
 class TestMulByNonResidue(unittest.TestCase):
