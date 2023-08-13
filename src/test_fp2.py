@@ -228,5 +228,76 @@ class TestNeg(unittest.TestCase):
         self.assertTrue(b.c0.eq(-(a.c0)) and b.c1.eq(-(a.c1)))
 
 
+class TestSub(unittest.TestCase):
+    def test_subtraction(self):
+        a = Fp2(
+            Fp(
+                [
+                    0xC9A2_1831_63EE_70D4,
+                    0xBC37_70A7_196B_5C91,
+                    0xA247_F8C1_304C_5F44,
+                    0xB01F_C2A3_726C_80B5,
+                    0xE1D2_93E5_BBD9_19C9,
+                    0x04B7_8E80_020E_F2CA,
+                ]
+            ),
+            Fp(
+                [
+                    0x952E_A446_0462_618F,
+                    0x238D_5EDD_F025_C62F,
+                    0xF6C9_4B01_2EA9_2E72,
+                    0x03CE_24EA_C1C9_3808,
+                    0x0559_50F9_45DA_483C,
+                    0x010A_768D_0DF4_EABC,
+                ]
+            ),
+        )
+        b = Fp2(
+            Fp(
+                [
+                    0xA1E0_9175_A4D2_C1FE,
+                    0x8B33_ACFC_204E_FF12,
+                    0xE244_15A1_1B45_6E42,
+                    0x61D9_96B1_B6EE_1936,
+                    0x1164_DBE8_667C_853C,
+                    0x0788_557A_CC7D_9C79,
+                ]
+            ),
+            Fp(
+                [
+                    0xDA6A_87CC_6F48_FA36,
+                    0x0FC7_B488_277C_1903,
+                    0x9445_AC4A_DC44_8187,
+                    0x0261_6D5B_C909_9209,
+                    0xDBED_4677_2DB5_8D48,
+                    0x11B9_4D50_76C7_B7B1,
+                ]
+            ),
+        )
+        c = Fp2(
+            Fp(
+                [
+                    0xE1C0_86BB_BF1B_5981,
+                    0x4FAF_C3A9_AA70_5D7E,
+                    0x2734_B5C1_0BB7_E726,
+                    0xB2BD_7776_AF03_7A3E,
+                    0x1B89_5FB3_98A8_4164,
+                    0x1730_4AEF_6F11_3CEC,
+                ]
+            ),
+            Fp(
+                [
+                    0x74C3_1C79_9519_1204,
+                    0x3271_AA54_79FD_AD2B,
+                    0xC9B4_7157_4915_A30F,
+                    0x65E4_0313_EC44_B8BE,
+                    0x7487_B238_5B70_67CB,
+                    0x0952_3B26_D0AD_19A4,
+                ]
+            ),
+        )
+        self.assertTrue((a - b).eq(c))
+
+
 if __name__ == "__main__":
     unittest.main()

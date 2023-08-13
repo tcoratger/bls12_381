@@ -10,6 +10,9 @@ class Fp2:
     def __neg__(self):
         return self.neg()
 
+    def __sub__(self, other):
+        return self.sub(other)
+
     @staticmethod
     def zero():
         return Fp2(Fp.zero(), Fp.zero())
@@ -52,3 +55,6 @@ class Fp2:
 
     def neg(self):
         return Fp2(-self.c0, -self.c1)
+
+    def sub(self, rhs):
+        return Fp2(self.c0 - rhs.c0, self.c1 - rhs.c1)
