@@ -198,3 +198,35 @@ class TestLexicographicLargest(unittest.TestCase):
                 Fp.zero(),
             ).lexicographically_largest()
         )
+
+
+class TestNeg(unittest.TestCase):
+    def test_neg(self):
+        a = Fp2(
+            Fp(
+                [
+                    0x1128_ECAD_6754_9455,
+                    0x9E7A_1CFF_3A4E_A1A8,
+                    0xEB20_8D51_E08B_CF27,
+                    0xE98A_D408_11F5_FC2B,
+                    0x736C_3A59_232D_511D,
+                    0x10AC_D42D_29CF_CBB6,
+                ]
+            ),
+            Fp(
+                [
+                    0xD328_E37C_C2F5_8D41,
+                    0x948D_F085_8A60_5869,
+                    0x6032_F9D5_6F93_A573,
+                    0x2BE4_83EF_3FFF_DC87,
+                    0x30EF_61F8_8F48_3C2A,
+                    0x1333_F55A_3572_5BE0,
+                ]
+            ),
+        )
+        b = -a
+        self.assertTrue(b.c0.eq(-(a.c0)) and b.c1.eq(-(a.c1)))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -7,6 +7,9 @@ class Fp2:
         self.c0 = c0
         self.c1 = c1
 
+    def __neg__(self):
+        return self.neg()
+
     @staticmethod
     def zero():
         return Fp2(Fp.zero(), Fp.zero())
@@ -46,3 +49,6 @@ class Fp2:
         return self.c1.lexicographically_largest() or (
             self.c1.is_zero() and self.c0.lexicographically_largest()
         )
+
+    def neg(self):
+        return Fp2(-self.c0, -self.c1)
