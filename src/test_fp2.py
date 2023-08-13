@@ -19,6 +19,32 @@ class TestOne(unittest.TestCase):
         self.assertTrue(a.c0.eq(Fp.one()) and a.c1.eq(Fp.zero()))
 
 
+class TestEq(unittest.TestCase):
+    def test_eq(self):
+        a = Fp(
+            [
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+                0xFFFFFFFF_FFFFFFFF,
+            ]
+        )
+        b = Fp(
+            [
+                0xB9FEFFFFFFFFAAAC,
+                0x1EABFFFEB153FFFF,
+                0x6730D2A0F6B0F624,
+                0x64774B84F38512BF,
+                0x4B1BA7B6434BACD7,
+                0x1A0111EA397FE69A,
+            ]
+        )
+        c = Fp2(a, b)
+        self.assertTrue(c.eq(c))
+
+
 class TestDefault(unittest.TestCase):
     def test_default(self):
         a = Fp2.default()

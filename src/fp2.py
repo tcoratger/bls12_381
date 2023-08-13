@@ -15,6 +15,9 @@ class Fp2:
     def one():
         return Fp2(Fp.one(), Fp.zero())
 
+    def eq(self, other):
+        return self.c0.eq(other.c0) and self.c1.eq(other.c1)
+
     def is_zero(self):
         return self.c0.is_zero() and self.c1.is_zero()
 
