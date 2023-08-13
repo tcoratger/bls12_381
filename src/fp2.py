@@ -16,6 +16,9 @@ class Fp2:
     def __sub__(self, other):
         return self.sub(other)
 
+    def __mul__(self, other):
+        return self.mul(other)
+
     @staticmethod
     def zero():
         return Fp2(Fp.zero(), Fp.zero())
@@ -64,3 +67,21 @@ class Fp2:
 
     def add(self, rhs):
         return Fp2(self.c0 + rhs.c0, self.c1 + rhs.c1)
+
+    def mul(self, rhs):
+        # F_{p^2} x F_{p^2} multiplication implemented with operand scanning (schoolbook)
+        # computes the result as:
+
+        #  a·b = (a_0 b_0 + a_1 b_1 β) + (a_0 b_1 + a_1 b_0)i
+
+        #  In BLS12-381's F_{p^2}, our β is -1, so the resulting F_{p^2} element is:
+
+        #    c_0 = a_0 b_0 - a_1 b_1
+        #    c_1 = a_0 b_1 + a_1 b_0
+
+        #  Each of these is a "sum of products", which we can compute efficiently.
+
+        return Fp2(
+            Fp.sum_of_products([self.c0, -self.c1], [rhs.c0, rhs.c1]),
+            Fp.sum_of_products([self.c0, self.c1], [rhs.c1, rhs.c0]),
+        )
