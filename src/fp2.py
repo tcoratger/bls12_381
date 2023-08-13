@@ -7,6 +7,9 @@ class Fp2:
         self.c0 = c0
         self.c1 = c1
 
+    def __add__(self, other):
+        return self.add(other)
+
     def __neg__(self):
         return self.neg()
 
@@ -58,3 +61,6 @@ class Fp2:
 
     def sub(self, rhs):
         return Fp2(self.c0 - rhs.c0, self.c1 - rhs.c1)
+
+    def add(self, rhs):
+        return Fp2(self.c0 + rhs.c0, self.c1 + rhs.c1)
