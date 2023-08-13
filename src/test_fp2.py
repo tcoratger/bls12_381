@@ -13,6 +13,12 @@ class TestZero(unittest.TestCase):
         self.assertTrue(a.c0.eq(Fp.zero()) and a.c1.eq(Fp.zero()))
 
 
+class TestOne(unittest.TestCase):
+    def test_one(self):
+        a = Fp2.one()
+        self.assertTrue(a.c0.eq(Fp.one()) and a.c1.eq(Fp.zero()))
+
+
 class TestDefault(unittest.TestCase):
     def test_default(self):
         a = Fp2.default()
