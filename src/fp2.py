@@ -20,3 +20,10 @@ class Fp2:
 
     def conjugate(self):
         return Fp2(self.c0, -self.c1)
+
+    def mul_by_nonresidue(self):
+        # Multiply a + bu by u + 1, getting
+        # au + a + bu^2 + bu
+        # and because u^2 = -1, we get
+        # (a - b) + (a + b)u
+        return Fp2(self.c0 - self.c1, self.c0 + self.c1)
