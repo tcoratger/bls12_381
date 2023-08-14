@@ -85,3 +85,22 @@ class Fp2:
             Fp.sum_of_products([self.c0, -self.c1], [rhs.c0, rhs.c1]),
             Fp.sum_of_products([self.c0, self.c1], [rhs.c1, rhs.c0]),
         )
+
+    def square(self):
+        # Complex squaring:
+
+        #  v0  = c0 * c1
+        #  c0' = (c0 + c1) * (c0 + \beta*c1) - v0 - \beta * v0
+        #  c1' = 2 * v0
+
+        #  In BLS12-381's F_{p^2}, our \beta is -1 so we
+        #  can modify this formula:
+
+        #  c0' = (c0 + c1) * (c0 - c1)
+        #  c1' = 2 * c0 * c1
+
+        a = self.c0 + self.c1
+        b = self.c0 - self.c1
+        c = self.c0 + self.c0
+
+        return Fp2(a * b, c * self.c1)
