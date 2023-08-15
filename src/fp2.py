@@ -108,3 +108,8 @@ class Fp2:
     @staticmethod
     def random(rng):
         return Fp2(Fp.random(rng), Fp.random(rng))
+
+    # Raises this element to p.
+    def frobenius_map(self):
+        # This is always just a conjugation.
+        return self.conjugate()
