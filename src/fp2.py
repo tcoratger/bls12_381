@@ -104,3 +104,7 @@ class Fp2:
         c = self.c0 + self.c0
 
         return Fp2(a * b, c * self.c1)
+
+    @staticmethod
+    def random(rng):
+        return Fp2(Fp.random(rng), Fp.random(rng))
