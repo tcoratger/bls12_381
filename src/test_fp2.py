@@ -530,5 +530,32 @@ class TestSquare(unittest.TestCase):
         self.assertTrue(a.square().eq(b))
 
 
+class TestFrobenius(unittest.TestCase):
+    def test_frobenius_map(self):
+        a = Fp2(
+            Fp(
+                [
+                    0xC9A2_1831_63EE_70D4,
+                    0xBC37_70A7_196B_5C91,
+                    0xA247_F8C1_304C_5F44,
+                    0xB01F_C2A3_726C_80B5,
+                    0xE1D2_93E5_BBD9_19C9,
+                    0x04B7_8E80_020E_F2CA,
+                ]
+            ),
+            Fp(
+                [
+                    0x952E_A446_0462_618F,
+                    0x238D_5EDD_F025_C62F,
+                    0xF6C9_4B01_2EA9_2E72,
+                    0x03CE_24EA_C1C9_3808,
+                    0x0559_50F9_45DA_483C,
+                    0x010A_768D_0DF4_EABC,
+                ]
+            ),
+        )
+        self.assertTrue(a.frobenius_map().eq(a.conjugate()))
+
+
 if __name__ == "__main__":
     unittest.main()
