@@ -44,6 +44,25 @@ class TestEq(unittest.TestCase):
         c = Fp2(a, b)
         self.assertTrue(c.eq(c))
 
+    def test_equality(self):
+        self.assertTrue(
+            Fp2(Fp([1, 2, 3, 4, 5, 6]), Fp([7, 8, 9, 10, 11, 12])).eq(
+                Fp2(Fp([1, 2, 3, 4, 5, 6]), Fp([7, 8, 9, 10, 11, 12]))
+            )
+        )
+
+        self.assertFalse(
+            Fp2(Fp([2, 2, 3, 4, 5, 6]), Fp([7, 8, 9, 10, 11, 12])).eq(
+                Fp2(Fp([1, 2, 3, 4, 5, 6]), Fp([7, 8, 9, 10, 11, 12]))
+            )
+        )
+
+        self.assertFalse(
+            Fp2(Fp([1, 2, 3, 4, 5, 6]), Fp([2, 8, 9, 10, 11, 12])).eq(
+                Fp2(Fp([1, 2, 3, 4, 5, 6]), Fp([7, 8, 9, 10, 11, 12]))
+            )
+        )
+
 
 class TestDefault(unittest.TestCase):
     def test_default(self):
