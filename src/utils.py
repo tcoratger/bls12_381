@@ -1,3 +1,9 @@
+class CtOption:
+    def __init__(self, value=None, choice=False):
+        self.value = value
+        self.choice = choice
+
+
 def sbb(a, b, borrow):
     """
     The function `sbb` subtracts `b` and `borrow` from `a` and returns the lower 64 bits of the result
@@ -84,3 +90,10 @@ def wrapping_sub_u64(a, b):
     performing a bitwise AND operation with the value `(1 << 64) - 1`.
     """
     return (a - b) & ((1 << 64) - 1)
+
+
+def array_to_number(a):
+    combined_value = 0
+    for num in reversed(a):
+        combined_value = (combined_value << 64) | num
+    return combined_value

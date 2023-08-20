@@ -1,11 +1,13 @@
 from typing import List
-from src.utils import sbb, mac, adc, wrapping_mul_u64, wrapping_sub_u64
-
-
-class CtOption:
-    def __init__(self, value=None, choice=False):
-        self.value = value
-        self.choice = choice
+from src.utils import (
+    sbb,
+    mac,
+    adc,
+    wrapping_mul_u64,
+    wrapping_sub_u64,
+    array_to_number,
+    CtOption,
+)
 
 
 class Fp:
@@ -518,6 +520,7 @@ R = Fp(
         0x15F6_5EC3_FA80_E493,
     ]
 )
+# R^{-1} mod p = 3231460744492646417066832100176244795738767926513225105051837195607029917124509527734802654356338138714468589979680
 
 # R2 = 2^(384*2) mod p
 R2 = Fp(

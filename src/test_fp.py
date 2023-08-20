@@ -3,6 +3,10 @@ from src.fp import (
     Fp,
 )
 
+from src.utils import array_to_number
+
+# python3 -m unittest src/test_fp.py
+
 
 class TestFp(unittest.TestCase):
     def test_is_zero(self):

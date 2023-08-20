@@ -557,5 +557,54 @@ class TestFrobenius(unittest.TestCase):
         self.assertTrue(a.frobenius_map().eq(a.conjugate()))
 
 
+class TestInvert(unittest.TestCase):
+    def test_invert(self):
+        a = Fp2(
+            Fp(
+                [
+                    0x1128_ECAD_6754_9455,
+                    0x9E7A_1CFF_3A4E_A1A8,
+                    0xEB20_8D51_E08B_CF27,
+                    0xE98A_D408_11F5_FC2B,
+                    0x736C_3A59_232D_511D,
+                    0x10AC_D42D_29CF_CBB6,
+                ]
+            ),
+            Fp(
+                [
+                    0xD328_E37C_C2F5_8D41,
+                    0x948D_F085_8A60_5869,
+                    0x6032_F9D5_6F93_A573,
+                    0x2BE4_83EF_3FFF_DC87,
+                    0x30EF_61F8_8F48_3C2A,
+                    0x1333_F55A_3572_5BE0,
+                ]
+            ),
+        )
+        b = Fp2(
+            Fp(
+                [
+                    0x0581_A133_3D4F_48A6,
+                    0x5824_2F6E_F074_8500,
+                    0x0292_C955_349E_6DA5,
+                    0xBA37_721D_DD95_FCD0,
+                    0x70D1_6790_3AA5_DFC5,
+                    0x1189_5E11_8B58_A9D5,
+                ]
+            ),
+            Fp(
+                [
+                    0x0EDA_09D2_D7A8_5D17,
+                    0x8808_E137_A7D1_A2CF,
+                    0x43AE_2625_C1FF_21DB,
+                    0xF85A_C9FD_F7A7_4C64,
+                    0x8FCC_DDA5_B8DA_9738,
+                    0x08E8_4F0C_B32C_D17D,
+                ]
+            ),
+        )
+        self.assertTrue((a.invert().value).eq(b))
+
+
 if __name__ == "__main__":
     unittest.main()

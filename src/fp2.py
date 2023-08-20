@@ -1,4 +1,4 @@
-from src.utils import sbb, mac, adc, wrapping_mul_u64, wrapping_sub_u64
+from src.utils import sbb, mac, adc, wrapping_mul_u64, wrapping_sub_u64, CtOption
 from src.fp import Fp
 
 
@@ -113,3 +113,30 @@ class Fp2:
     def frobenius_map(self):
         # This is always just a conjugation.
         return self.conjugate()
+
+    # Computes the multiplicative inverse of this field
+    # element, returning None in the case that this element
+    # is zero.
+    def invert(self):
+        # We wish to find the multiplicative inverse of a nonzero
+        # element a + bu in Fp2. We leverage an identity
+
+        # (a + bu)(a - bu) = a^2 + b^2
+
+        # which holds because u^2 = -1. This can be rewritten as
+
+        # (a + bu)(a - bu)/(a^2 + b^2) = 1
+
+        # because a^2 + b^2 = 0 has no nonzero solutions for (a, b).
+        # This gives that (a - bu)/(a^2 + b^2) is the inverse
+        # of (a + bu). Importantly, this can be computing using
+        # only a single inversion in Fp.
+
+        result = ((self.c0).square() + (self.c1).square()).invert()
+
+        if result.choice:
+            return CtOption(
+                Fp2(self.c0 * result.value, self.c1 * (-result.value)), True
+            )
+
+        return CtOption(None, True)
