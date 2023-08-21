@@ -69,8 +69,14 @@ class TestFp(unittest.TestCase):
         b = Fp6.from_fp2(a)
         self.assertTrue(b.c0.eq(a) and b.c1.eq(Fp2.zero()) and b.c2.eq(Fp2.zero()))
 
-    def test_toto(self):
 
+class TestMulByNonresidue(unittest.TestCase):
+    def test_mul_by_nonresidue(self):
+        a = Fp6.random(random.Random())
+        b = a.mul_by_nonresidue()
+        self.assertTrue(
+            b.c0.eq(a.c2 * Fp2(Fp.one(), Fp.one())) and b.c1.eq(a.c0) and b.c2.eq(a.c1)
+        )
 
 
 if __name__ == "__main__":
