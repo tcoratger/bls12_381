@@ -606,5 +606,99 @@ class TestInvert(unittest.TestCase):
         self.assertTrue((a.invert().value).eq(b))
 
 
+class TestSqrt(unittest.TestCase):
+    def test_sqrt(self):
+        # a = 1488924004771393321054797166853618474668089414631333405711627789629391903630694737978065425271543178763948256226639*u + 784063022264861764559335808165825052288770346101304131934508881646553551234697082295473567906267937225174620141295
+        a = Fp2(
+            Fp(
+                [
+                    0x2BEE_D146_27D7_F9E9,
+                    0xB661_4E06_660E_5DCE,
+                    0x06C4_CC7C_2F91_D42C,
+                    0x996D_7847_4B7A_63CC,
+                    0xEBAE_BC4C_820D_574E,
+                    0x1886_5E12_D93F_D845,
+                ]
+            ),
+            Fp(
+                [
+                    0x7D82_8664_BAF4_F566,
+                    0xD17E_6639_96EC_7339,
+                    0x679E_AD55_CB40_78D0,
+                    0xFE3B_2260_E001_EC28,
+                    0x3059_93D0_43D9_1B68,
+                    0x0626_F03C_0489_B72D,
+                ]
+            ),
+        )
+        a_sqrt = a.sqrt()
+        self.assertTrue((a_sqrt.value.square()).eq(a) and a_sqrt.choice)
+
+        # b = 5, which is a generator of the p - 1 order
+        # multiplicative subgroup
+        b = Fp2(
+            Fp(
+                [
+                    0x6631_0000_0010_5545,
+                    0x2114_0040_0EEC_000D,
+                    0x3FA7_AF30_C820_E316,
+                    0xC52A_8B8D_6387_695D,
+                    0x9FB4_E61D_1E83_EAC5,
+                    0x005C_B922_AFE8_4DC7,
+                ]
+            ),
+            Fp.zero(),
+        )
+        b_sqrt = b.sqrt()
+        self.assertTrue((b_sqrt.value.square()).eq(b) and b_sqrt.choice)
+
+        #     c = 25, which is a generator of the (p - 1) / 2 order
+        # multiplicative subgroup
+        c = Fp2(
+            Fp(
+                [
+                    0x44F6_0000_0051_FFAE,
+                    0x86B8_0141_9948_0043,
+                    0xD715_9952_F1F3_794A,
+                    0x755D_6E3D_FE1F_FC12,
+                    0xD36C_D6DB_5547_E905,
+                    0x02F8_C8EC_BF18_67BB,
+                ]
+            ),
+            Fp.zero(),
+        )
+        c_sqrt = c.sqrt()
+        self.assertTrue((c_sqrt.value.square()).eq(c) and c_sqrt.choice)
+
+        # 2155129644831861015726826462986972654175647013268275306775721078997042729172900466542651176384766902407257452753362*u + 2796889544896299244102912275102369318775038861758288697415827248356648685135290329705805931514906495247464901062529
+        # is nonsquare.
+        d = Fp2(
+            Fp(
+                [
+                    0xC5FA_1BC8_FD00_D7F6,
+                    0x3830_CA45_4606_003B,
+                    0x2B28_7F11_04B1_02DA,
+                    0xA7FB_30F2_8230_F23E,
+                    0x339C_DB9E_E953_DBF0,
+                    0x0D78_EC51_D989_FC57,
+                ]
+            ),
+            Fp(
+                [
+                    0x27EC_4898_CF87_F613,
+                    0x9DE1_394E_1ABB_05A5,
+                    0x0947_F85D_C170_FC14,
+                    0x586F_BC69_6B61_14B7,
+                    0x2B34_75A4_077D_7169,
+                    0x13E1_C895_CC4B_6C22,
+                ]
+            ),
+        )
+        d_sqrt = d.sqrt()
+        self.assertTrue(d_sqrt.value == None and not d_sqrt.choice)
+
+        c.sqrt()
+
+
 if __name__ == "__main__":
     unittest.main()

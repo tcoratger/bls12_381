@@ -394,9 +394,6 @@ class Fp:
                 if (e >> i) & 1 == 1:
                     res *= self
 
-            # Call the Montgomery reduction function here if needed
-            # (montgomery_reduce(res.array[0], res.array[1], ...))
-
         return res
 
     def sqrt(self):

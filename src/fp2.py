@@ -140,3 +140,70 @@ class Fp2:
             )
 
         return CtOption(None, True)
+
+    def pow_vartime(self, by):
+        res = Fp2.one()
+
+        for e in reversed(by):
+            for i in reversed(range(64)):
+                res = res.square()
+
+                if (e >> i) & 1 == 1:
+                    res *= self
+
+        return res
+
+    def sqrt(self):
+        # Algorithm 9, https://eprint.iacr.org/2012/685.pdf
+        # with constant time modifications.
+        if self.is_zero():
+            return CtOption(Fp2.zero(), True)
+
+        # a1 = self^((p - 3) / 4)
+        a1 = self.pow_vartime(
+            [
+                0xEE7F_BFFF_FFFF_EAAA,
+                0x07AA_FFFF_AC54_FFFF,
+                0xD9CC_34A8_3DAC_3D89,
+                0xD91D_D2E1_3CE1_44AF,
+                0x92C6_E9ED_90D2_EB35,
+                0x0680_447A_8E5F_F9A6,
+            ]
+        )
+
+        # alpha = a1^2 * self = self^((p - 3) / 2 + 1) = self^((p - 1) / 2)
+        alpha = a1.square() * self
+        # x0 = self^((p + 1) / 4)
+        x0 = a1 * self
+
+        # In the event that alpha = -1, the element is order p - 1 and so
+        # we're just trying to get the square of an element of the subfield
+        # Fp. This is given by x0 * u, since u = sqrt(-1). Since the element
+        # x0 = a + bu has b = 0, the solution is therefore au.
+        if alpha.eq(-Fp2.one()):
+            return CtOption(Fp2(-x0.c1, x0.c0), alpha.eq(-Fp2.one()))
+
+        # Otherwise, the correct solution is (1 + alpha)^((q - 1) // 2) * x0
+        result = (alpha + Fp2.one()).pow_vartime(
+            [
+                0xDCFF_7FFF_FFFF_D555,
+                0x0F55_FFFF_58A9_FFFF,
+                0xB398_6950_7B58_7B12,
+                0xB23B_A5C2_79C2_895F,
+                0x258D_D3DB_21A5_D66B,
+                0x0D00_88F5_1CBF_F34D,
+            ]
+        ) * x0
+
+        # Only return the result if it's really the square root (and so
+        # self is actually quadratic nonresidue)
+        if result.square().eq(self):
+            return CtOption(
+                result,
+                True,
+            )
+
+        return CtOption(
+            None,
+            False,
+        )
