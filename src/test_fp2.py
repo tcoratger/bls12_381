@@ -7,6 +7,22 @@ from src.fp2 import (
 )
 
 
+class TestFp2(unittest.TestCase):
+    def test_from_fp(self):
+        a = Fp(
+            [
+                0x1234_5678_90AB_CDEF,
+                0x9876_5432_10FE_DCBA,
+                0xAAAA_BBBB_CCCC_DDDD,
+                0x1111_2222_3333_4444,
+                0xCCCC_DDDD_EEEE_FFFF,
+                0xFFFF_0000_1111_2222,
+            ]
+        )
+        b = Fp2.from_fp(a)
+        self.assertTrue(b.c0.eq(a) and b.c1.eq(Fp.zero()))
+
+
 class TestZero(unittest.TestCase):
     def test_is_zero(self):
         a = Fp2.zero()
