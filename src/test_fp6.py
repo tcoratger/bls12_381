@@ -8,6 +8,7 @@ from src.fp2 import (
 from src.fp6 import (
     Fp6,
 )
+import random
 
 
 class TestFp(unittest.TestCase):
@@ -67,6 +68,9 @@ class TestFp(unittest.TestCase):
         )
         b = Fp6.from_fp2(a)
         self.assertTrue(b.c0.eq(a) and b.c1.eq(Fp2.zero()) and b.c2.eq(Fp2.zero()))
+
+    def test_toto(self):
+
 
 
 if __name__ == "__main__":
