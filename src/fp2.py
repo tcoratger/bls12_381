@@ -19,6 +19,9 @@ class Fp2:
     def __mul__(self, other):
         return self.mul(other)
 
+    def from_fp(f: Fp):
+        return Fp2(f, Fp.zero())
+
     @staticmethod
     def zero():
         return Fp2(Fp.zero(), Fp.zero())
