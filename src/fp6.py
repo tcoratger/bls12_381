@@ -104,3 +104,62 @@ class Fp6:
         )
 
         return Fp6(c0, c1, c2)
+
+    # Returns `c = self * b`.
+    # Implements the full-tower interleaving strategy from
+    # [ePrint 2022-376](https://eprint.iacr.org/2022/367).
+    def mul_interleaved(self, b):
+        # The intuition for this algorithm is that we can view Fp^6 as a direct extension of Fp^2 and express the
+        # overall operations down to the base field Fp instead of only over Fp^2. This enables us to interleave
+        # multiplications and reductions, ensuring that we don't require double-width intermediate representations
+        # (with around twice as many limbs as Fp elements).
+
+        # We want to express the multiplication c = a x b, where a = (a_0, a_1, a_2) is an element of Fp^6, and
+        # a_i = (a_i,0, a_i,1) is an element of Fp^2. The fully expanded multiplication is given by (2022-376 §5):
+
+        # ...
+        # (The rest of the calculations are omitted here for the sake of brevity)
+
+        a = self
+        b10_p_b11 = b.c1.c0 + b.c1.c1
+        b10_m_b11 = b.c1.c0 - b.c1.c1
+        b20_p_b21 = b.c2.c0 + b.c2.c1
+        b20_m_b21 = b.c2.c0 - b.c2.c1
+
+        c0 = Fp2(
+            Fp.sum_of_products(
+                [a.c0.c0, -a.c0.c1, a.c1.c0, -a.c1.c1, a.c2.c0, -a.c2.c1],
+                [b.c0.c0, b.c0.c1, b20_m_b21, b20_p_b21, b10_m_b11, b10_p_b11],
+            ),
+            Fp.sum_of_products(
+                [a.c0.c0, a.c0.c1, a.c1.c0, a.c1.c1, a.c2.c0, a.c2.c1],
+                [b.c0.c1, b.c0.c0, b20_p_b21, b20_m_b21, b10_p_b11, b10_m_b11],
+            ),
+        )
+
+        c1 = Fp2(
+            Fp.sum_of_products(
+                [a.c0.c0, -a.c0.c1, a.c1.c0, -a.c1.c1, a.c2.c0, -a.c2.c1],
+                [b.c1.c0, b.c1.c1, b.c0.c0, b.c0.c1, b20_m_b21, b20_p_b21],
+            ),
+            Fp.sum_of_products(
+                [a.c0.c0, a.c0.c1, a.c1.c0, a.c1.c1, a.c2.c0, a.c2.c1],
+                [b.c1.c1, b.c1.c0, b.c0.c1, b.c0.c0, b20_p_b21, b20_m_b21],
+            ),
+        )
+
+        c2 = Fp2(
+            Fp.sum_of_products(
+                [a.c0.c0, -a.c0.c1, a.c1.c0, -a.c1.c1, a.c2.c0, -a.c2.c1],
+                [b.c2.c0, b.c2.c1, b.c1.c0, b.c1.c1, b.c0.c0, b.c0.c1],
+            ),
+            Fp.sum_of_products(
+                [a.c0.c0, a.c0.c1, a.c1.c0, a.c1.c1, a.c2.c0, a.c2.c1],
+                [b.c2.c1, b.c2.c0, b.c1.c1, b.c1.c0, b.c0.c1, b.c0.c0],
+            ),
+        )
+
+        return Fp6(c0, c1, c2)
+
+    def mul(self, rhs):
+        return self.mul_interleaved(rhs)
