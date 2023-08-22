@@ -9,6 +9,7 @@ from src.fp6 import (
     Fp6,
 )
 import random
+from src.utils import array_to_number
 
 
 class TestFp(unittest.TestCase):

@@ -63,3 +63,41 @@ class Fp6:
         #     c(u + 1) + av + v^2
 
         return Fp6(self.c2.mul_by_nonresidue(), self.c0, self.c1)
+
+    # Raises this element to p.
+    def frobenius_map(self):
+        c0 = self.c0.frobenius_map()
+        c1 = self.c1.frobenius_map()
+        c2 = self.c2.frobenius_map()
+
+        # c1 = c1 * (u + 1)^((p - 1) / 3)
+        c1 = c1 * Fp2(
+            Fp.zero(),
+            Fp(
+                [
+                    0xCD03_C9E4_8671_F071,
+                    0x5DAB_2246_1FCD_A5D2,
+                    0x5870_42AF_D385_1B95,
+                    0x8EB6_0EBE_01BA_CB9E,
+                    0x03F9_7D6E_83D0_50D2,
+                    0x18F0_2065_5463_8741,
+                ]
+            ),
+        )
+
+        # c2 = c2 * (u + 1)^((2p - 2) / 3)
+        c2 = c2 * Fp2(
+            Fp(
+                [
+                    0x890D_C9E4_8675_45C3,
+                    0x2AF3_2253_3285_A5D5,
+                    0x5088_0866_309B_7E2C,
+                    0xA20D_1B8C_7E88_1024,
+                    0x14E4_F04F_E2DB_9068,
+                    0x14E5_6D3F_1564_853A,
+                ]
+            ),
+            Fp.zero(),
+        )
+
+        return Fp6(c0, c1, c2)
