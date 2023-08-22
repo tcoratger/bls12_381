@@ -163,3 +163,42 @@ class Fp6:
 
     def mul(self, rhs):
         return self.mul_interleaved(rhs)
+
+    def square(self):
+        s0 = self.c0.square()
+        ab = self.c0 * self.c1
+        s1 = ab + ab
+        s2 = (self.c0 - self.c1 + self.c2).square()
+        bc = self.c1 * self.c2
+        s3 = bc + bc
+        s4 = self.c2.square()
+
+        return Fp6(
+            s3.mul_by_nonresidue() + s0,
+            s4.mul_by_nonresidue() + s1,
+            s1 + s2 + s3 - s0 - s4,
+        )
+
+    def invert(self):
+        c0 = (self.c1 * self.c2).mul_by_nonresidue()
+        c0 = self.c0.square() - c0
+
+        c1 = self.c2.square().mul_by_nonresidue()
+        c1 = c1 - (self.c0 * self.c1)
+
+        c2 = self.c1.square()
+        c2 = c2 - (self.c0 * self.c2)
+
+        tmp = ((self.c1 * c2) + (self.c2 * c1)).mul_by_nonresidue()
+        tmp = tmp + (self.c0 * c0)
+
+        inverted_tmp = tmp.invert()
+
+        if inverted_tmp.choice:
+            t = inverted_tmp.value
+            return CtOption(Fp6(c0 * t, c1 * t, c2 * t), True)
+        else:
+            return CtOption(Fp6.zero(), False)
+
+    def add(self, rhs):
+        return Fp6(self.c0 + rhs.c0, self.c1 + rhs.c1, self.c2 + rhs.c2)
