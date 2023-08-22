@@ -25,6 +25,9 @@ class Fp6:
     def from_fp(f: Fp):
         return Fp6(Fp2.from_fp(f), Fp2.zero(), Fp2.zero())
 
+    def is_zero(self):
+        return self.c0.is_zero() and self.c1.is_zero() and self.c2.is_zero()
+
     def from_fp2(f: Fp2):
         return Fp6(f, Fp2.zero(), Fp2.zero())
 

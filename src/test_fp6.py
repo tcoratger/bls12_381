@@ -71,6 +71,15 @@ class TestFp(unittest.TestCase):
         self.assertTrue(b.c0.eq(a) and b.c1.eq(Fp2.zero()) and b.c2.eq(Fp2.zero()))
 
 
+class TestIsZero(unittest.TestCase):
+    def test_is_zero(self):
+        a = Fp6.zero()
+        self.assertTrue(a.is_zero())
+
+        b = Fp6.one()
+        self.assertFalse(b.is_zero())
+
+
 class TestMulByNonresidue(unittest.TestCase):
     def test_mul_by_nonresidue(self):
         a = Fp6.random(random.Random())
