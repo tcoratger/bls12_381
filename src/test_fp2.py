@@ -766,6 +766,54 @@ class TestFrobeniusMap(unittest.TestCase):
         self.assertTrue(c.eq(b))
         self.assertTrue(c.c0.eq(a.c0) and c.c1.eq(-(a.c1)))
 
+        aa = Fp2(
+            Fp(
+                [
+                    0x47F9_CB98_B1B8_2D58,
+                    0x5FE9_11EB_A3AA_1D9D,
+                    0x96BF_1B5F_4DD8_1DB3,
+                    0x8100_D27C_C925_9F5B,
+                    0xAFA2_0B96_7464_0EAB,
+                    0x09BB_CEA7_D8D9_497D,
+                ]
+            ),
+            Fp(
+                [
+                    0x0303_CB98_B166_2DAA,
+                    0xD931_10AA_0A62_1D5A,
+                    0xBFA9_820C_5BE4_A468,
+                    0x0BA3_643E_CB05_A348,
+                    0xDC35_34BB_1F1C_25A6,
+                    0x06C3_05BB_19C0_E1C1,
+                ]
+            ),
+        )
+        bb = Fp2(
+            Fp(
+                [
+                    0x47F9CB98B1B82D58,
+                    0x5FE911EBA3AA1D9D,
+                    0x96BF1B5F4DD81DB3,
+                    0x8100D27CC9259F5B,
+                    0xAFA20B9674640EAB,
+                    0x9BBCEA7D8D9497D,
+                ]
+            ),
+            Fp(
+                [
+                    0xB6FB34674E997D01,
+                    0x457AEF54A6F1E2A5,
+                    0xA78750949ACC51BB,
+                    0x58D3E746287F6F76,
+                    0x6EE672FB242F8731,
+                    0x133E0C2F1FBF04D8,
+                ]
+            ),
+        )
+        cc = aa.frobenius_map()
+        self.assertTrue(cc.eq(bb))
+        self.assertTrue(cc.c0.eq(aa.c0) and cc.c1.eq(-(aa.c1)))
+
 
 if __name__ == "__main__":
     unittest.main()
