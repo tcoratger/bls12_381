@@ -11,10 +11,7 @@ class Fp6:
         self.c2 = c2
 
     def __str__(self):
-        result = f"Fp6:\n"
-        result += f"c0: {self.c0}\n"
-        result += f"c1: {self.c1}\n"
-        result += f"c2: {self.c2}"
+        result = f"{self.c0} + ({self.c1})*v + ({self.c2})*v^2\n"
         return result
 
     def __add__(self, other):

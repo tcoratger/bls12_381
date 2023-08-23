@@ -10,6 +10,22 @@ class Fp12:
         self.c0 = c0
         self.c1 = c1
 
+    def __str__(self):
+        result = f"{self.c0} + ({self.c1})*w\n"
+        return result
+
+    def __add__(self, other):
+        return self.add(other)
+
+    def __neg__(self):
+        return self.neg()
+
+    def __sub__(self, other):
+        return self.sub(other)
+
+    def __mul__(self, other):
+        return self.mul(other)
+
     def from_fp(f: Fp):
         return Fp12(Fp6.from_fp(f), Fp6.zero())
 
@@ -32,7 +48,7 @@ class Fp12:
         return Fp12.zero()
 
     def eq(self, other):
-        return self.c0 == other.c0 and self.c1 == other.c1 and self.c2 == other.c2
+        return self.c0.eq(other.c0) and self.c1.eq(other.c1)
 
     @staticmethod
     def random(rng):
@@ -53,6 +69,48 @@ class Fp12:
 
     def conjugate(self):
         return Fp12(self.c0, -self.c1)
+
+    def add(self, rhs):
+        return Fp12(self.c0 + rhs.c0, self.c1 + rhs.c1)
+
+    def neg(self):
+        return Fp12(-self.c0, -self.c1)
+
+    def sub(self, rhs):
+        return Fp12(self.c0 - rhs.c0, self.c1 - rhs.c1)
+
+    def square(self):
+        ab = self.c0 * self.c1
+        c0c1 = self.c0 + self.c1
+        c0 = self.c1.mul_by_nonresidue()
+        c0 = c0 + self.c0
+        c0 = c0 * c0c1
+        c0 = c0 - ab
+        c1 = ab + ab
+        c0 = c0 - ab.mul_by_nonresidue()
+
+        return Fp12(c0, c1)
+
+    def invert(self):
+        a = (self.c0.square() - self.c1.square().mul_by_nonresidue()).invert()
+
+        if a.choice:
+            return CtOption(Fp12(self.c0 * a.value, self.c1 * (-a.value)), True)
+
+        return CtOption(None, False)
+
+    def mul(self, other):
+        aa = self.c0 * other.c0
+        bb = self.c1 * other.c1
+        o = other.c0 + other.c1
+        c1 = self.c1 + self.c0
+        c1 = c1 * o
+        c1 = c1 - aa
+        c1 = c1 - bb
+        c0 = bb.mul_by_nonresidue()
+        c0 = c0 + aa
+
+        return Fp12(c0, c1)
 
     # Raises this element to p.
     def frobenius_map(self):

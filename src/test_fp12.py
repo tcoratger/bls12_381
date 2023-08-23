@@ -474,25 +474,37 @@ class TestArithemetic(unittest.TestCase):
             ),
         )
 
-        a_c0_frobenius_map_c0_c0_array = a.c0.frobenius_map().c0.c0.array
-        hex_list = [hex(num) for num in a_c0_frobenius_map_c0_c0_array]
+        # because a and b and c are similar to each other and
+        # I was lazy, this is just some arbitrary way to make
+        # them a little more different
+        a = (a.square().invert().value).square() + c
+        b = (b.square().invert().value).square() + a
+        c = (c.square().invert().value).square() + b
 
-        print(a.c0.frobenius_map())
+        self.assertTrue(a.square().eq(a * a))
+        self.assertTrue(b.square().eq(b * b))
+        self.assertTrue(c.square().eq(c * c))
 
         self.assertFalse(a.eq(a.frobenius_map()))
-        # self.assertTrue(
-        #     a.eq(
-        #         a.frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #         .frobenius_map()
-        #     )
-        # )
+        self.assertTrue(
+            a.eq(
+                a.frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+                .frobenius_map()
+            )
+        )
+
+        self.assertTrue(((a + b) * c.square()).eq((c * c * a) + (c * c * b)))
+        self.assertTrue(
+            (a.invert().value * b.invert().value).eq((a * b).invert().value)
+        )
+        self.assertTrue((a.invert().value * a).eq(Fp12.one()))

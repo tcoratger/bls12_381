@@ -321,6 +321,7 @@ class TestArithmetic(unittest.TestCase):
         self.assertTrue(
             c.c0.eq(a.c0 - b.c0) and c.c1.eq(a.c1 - b.c1) and c.c2.eq(a.c2 - b.c2)
         )
+        self.assertTrue((a - b + b).eq(a))
 
 
 class TestFrobeniusMap(unittest.TestCase):

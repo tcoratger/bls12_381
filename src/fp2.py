@@ -8,13 +8,7 @@ class Fp2:
         self.c1 = c1
 
     def __str__(self):
-        # result = f"Fp2:\n"
-        # result += f"c0: {self.c0}\n"
-        # result += f"c1: {self.c1}\n"
-        # return result
-        # result = f"Fp2:\n"
-        # result += f"c0: {self.c0}\n"
-        result = f"({self.c0} + {self.c1} * u)\n"
+        result = f"{self.c0} + {self.c1}*u\n"
         return result
 
     def __add__(self, other):
