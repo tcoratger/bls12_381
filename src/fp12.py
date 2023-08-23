@@ -53,3 +53,36 @@ class Fp12:
 
     def conjugate(self):
         return Fp12(self.c0, -self.c1)
+
+    # Raises this element to p.
+    def frobenius_map(self):
+        c0 = self.c0.frobenius_map()
+        c1 = self.c1.frobenius_map()
+
+        # c1 = c1 * (u + 1)^((p - 1) / 6)
+        c1 = c1 * Fp6.from_fp2(
+            Fp2(
+                Fp(
+                    [
+                        0x0708_9552_B319_D465,
+                        0xC669_5F92_B50A_8313,
+                        0x97E8_3CCC_D117_228F,
+                        0xA35B_AECA_B2DC_29EE,
+                        0x1CE3_93EA_5DAA_CE4D,
+                        0x08F2_220F_B0FB_66EB,
+                    ]
+                ),
+                Fp(
+                    [
+                        0xB2F6_6AAD_4CE5_D646,
+                        0x5842_A06B_FC49_7CEC,
+                        0xCF48_95D4_2599_D394,
+                        0xC11B_9CBA_40A8_E8D0,
+                        0x2E38_13CB_E5A0_DE89,
+                        0x110E_EFDA_8884_7FAF,
+                    ]
+                ),
+            )
+        )
+
+        return Fp12(c0, c1)

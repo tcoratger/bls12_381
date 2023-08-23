@@ -14,6 +14,12 @@ class Fp:
     def __init__(self, array):
         self.array = array
 
+    def __str__(self):
+        hex_array = [hex(num)[2:] for num in self.array[::-1]]
+        concatenated_hex = "".join(hex_array)
+        result = f"Fp: 0x{concatenated_hex}\n"
+        return result
+
     def __mul__(self, other):
         return self.mul(other)
 

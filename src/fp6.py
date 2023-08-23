@@ -10,6 +10,13 @@ class Fp6:
         self.c1 = c1
         self.c2 = c2
 
+    def __str__(self):
+        result = f"Fp6:\n"
+        result += f"c0: {self.c0}\n"
+        result += f"c1: {self.c1}\n"
+        result += f"c2: {self.c2}"
+        return result
+
     def __add__(self, other):
         return self.add(other)
 

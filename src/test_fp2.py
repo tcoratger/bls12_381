@@ -716,5 +716,56 @@ class TestSqrt(unittest.TestCase):
         c.sqrt()
 
 
+class TestFrobeniusMap(unittest.TestCase):
+    def test_frobenius_map(self):
+        a = Fp2(
+            Fp(
+                [
+                    0xC9A2_1831_63EE_70D4,
+                    0xBC37_70A7_196B_5C91,
+                    0xA247_F8C1_304C_5F44,
+                    0xB01F_C2A3_726C_80B5,
+                    0xE1D2_93E5_BBD9_19C9,
+                    0x04B7_8E80_020E_F2CA,
+                ]
+            ),
+            Fp(
+                [
+                    0x952E_A446_0462_618F,
+                    0x238D_5EDD_F025_C62F,
+                    0xF6C9_4B01_2EA9_2E72,
+                    0x03CE_24EA_C1C9_3808,
+                    0x0559_50F9_45DA_483C,
+                    0x010A_768D_0DF4_EABC,
+                ]
+            ),
+        )
+        b = Fp2(
+            Fp(
+                [
+                    0xC9A2183163EE70D4,
+                    0xBC3770A7196B5C91,
+                    0xA247F8C1304C5F44,
+                    0xB01FC2A3726C80B5,
+                    0xE1D293E5BBD919C9,
+                    0x4B78E80020EF2CA,
+                ]
+            ),
+            Fp(
+                [
+                    0x24D05BB9FB9D491C,
+                    0xFB1EA120C12E39D0,
+                    0x7067879FC807C7B1,
+                    0x60A9269A31BBDAB6,
+                    0x45C256BCFD71649B,
+                    0x18F69B5D2B8AFBDE,
+                ]
+            ),
+        )
+        c = a.frobenius_map()
+        self.assertTrue(c.eq(b))
+        self.assertTrue(c.c0.eq(a.c0) and c.c1.eq(-(a.c1)))
+
+
 if __name__ == "__main__":
     unittest.main()
