@@ -37,3 +37,19 @@ class Fp12:
     @staticmethod
     def random(rng):
         return Fp12(Fp6.random(rng), Fp6.random(rng))
+
+    def mul_by_014(self, c0: Fp2, c1: Fp2, c4: Fp2):
+        aa = self.c0.mul_by_01(c0, c1)
+        bb = self.c1.mul_by_1(c4)
+        o = c1 + c4
+        c1 = self.c1 + self.c0
+        c1 = c1.mul_by_01(c0, o)
+        c1 = c1 - aa - bb
+        c0 = bb
+        c0 = c0.mul_by_nonresidue()
+        c0 = c0 + aa
+
+        Fp12(c0, c1)
+
+    def conjugate(self):
+        return Fp12(self.c0, -self.c1)

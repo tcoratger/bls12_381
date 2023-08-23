@@ -46,3 +46,10 @@ class TestFp(unittest.TestCase):
     def test_one(self):
         a = Fp12.one()
         self.assertTrue(a.c0.eq(Fp6.one()) and a.c1.is_zero())
+
+
+class TestConjugate(unittest.TestCase):
+    def test_conjugate(self):
+        a = Fp12.random(random.Random())
+        b = a.conjugate()
+        self.assertTrue(b.c0.eq(a.c0) and b.c1.eq(-a.c1))
