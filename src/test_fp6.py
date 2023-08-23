@@ -303,7 +303,11 @@ class TestArithmetic(unittest.TestCase):
         self.assertTrue(c.square().eq(c * c))
         self.assertTrue(
             (a.invert().value * b.invert().value).eq((a * b).invert().value)
+            and a.invert().choice
+            and b.invert().choice
         )
+        self.assertTrue(((a + b) * c.square()).eq((c * c * a) + (c * c * b)))
+        self.assertTrue((a.invert().value * a).eq(Fp6.one()) and a.invert().choice)
 
 
 if __name__ == "__main__":
