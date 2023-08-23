@@ -309,6 +309,19 @@ class TestArithmetic(unittest.TestCase):
         self.assertTrue(((a + b) * c.square()).eq((c * c * a) + (c * c * b)))
         self.assertTrue((a.invert().value * a).eq(Fp6.one()) and a.invert().choice)
 
+    def test_neg(self):
+        a = Fp6.random(random.Random())
+        b = -a
+        self.assertTrue(b.c0.eq(-(a.c0)) and b.c1.eq(-(a.c1)) and b.c2.eq(-(a.c2)))
+
+    def test_sub(self):
+        a = Fp6.random(random.Random())
+        b = Fp6.random(random.Random())
+        c = a - b
+        self.assertTrue(
+            c.c0.eq(a.c0 - b.c0) and c.c1.eq(a.c1 - b.c1) and c.c2.eq(a.c2 - b.c2)
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

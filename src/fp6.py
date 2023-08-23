@@ -202,3 +202,9 @@ class Fp6:
 
     def add(self, rhs):
         return Fp6(self.c0 + rhs.c0, self.c1 + rhs.c1, self.c2 + rhs.c2)
+
+    def neg(self):
+        return Fp6(-self.c0, -self.c1, -self.c2)
+
+    def sub(self, rhs):
+        return Fp6(self.c0 - rhs.c0, self.c1 - rhs.c1, self.c2 - rhs.c2)
