@@ -30,3 +30,19 @@ class TestFp(unittest.TestCase):
         a = Fp6.random(random.Random())
         b = Fp12.from_fp6(a)
         self.assertTrue(b.c0.eq(a) and b.c1.is_zero())
+
+    def test_zero(self):
+        a = Fp12.zero()
+        self.assertTrue(a.c0.is_zero() and a.c1.is_zero())
+
+    def test_is_zero(self):
+        a = Fp12.zero()
+        self.assertTrue(a.is_zero())
+
+    def test_default(self):
+        a = Fp12.default()
+        self.assertTrue(a.c0.is_zero() and a.c1.is_zero())
+
+    def test_one(self):
+        a = Fp12.one()
+        self.assertTrue(a.c0.eq(Fp6.one()) and a.c1.is_zero())

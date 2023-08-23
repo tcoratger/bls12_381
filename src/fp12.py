@@ -18,3 +18,22 @@ class Fp12:
 
     def from_fp6(f: Fp6):
         return Fp12(f, Fp6.zero())
+
+    def zero():
+        return Fp12(Fp6.zero(), Fp6.zero())
+
+    def is_zero(self):
+        return self.c0.is_zero() and self.c1.is_zero()
+
+    def one():
+        return Fp12(Fp6.one(), Fp6.zero())
+
+    def default():
+        return Fp12.zero()
+
+    def eq(self, other):
+        return self.c0 == other.c0 and self.c1 == other.c1 and self.c2 == other.c2
+
+    @staticmethod
+    def random(rng):
+        return Fp12(Fp6.random(rng), Fp6.random(rng))
