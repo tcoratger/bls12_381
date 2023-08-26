@@ -3,7 +3,7 @@ from src.fp import (
     Fp,
 )
 
-from src.utils import array_to_number
+from src.utils import array_to_number, Choice
 
 # python3 -m unittest src/test_fp.py
 
@@ -740,6 +740,33 @@ class TestToBytes(unittest.TestCase):
             tmp = a.to_bytes()
             b = Fp.from_bytes(tmp)
             self.assertTrue(a.eq(b.value) and b.choice)
+
+
+class TestConditionnalSelect(unittest.TestCase):
+    def test_conditional_select(self):
+        a = Fp(
+            [
+                0xDC90_6D9B_E3F9_5DC8,
+                0x8755_CAF7_4596_91A1,
+                0xCFF1_A7F4_E958_3AB3,
+                0x9B43_821F_849E_2284,
+                0xF575_54F3_A297_4F3F,
+                0x085D_BEA8_4ED4_7F79,
+            ]
+        )
+        b = Fp(
+            [
+                0xA1FA_FFFF_FFFE_5557,
+                0x995B_FFF9_76A3_FFFE,
+                0x03F4_1D24_D174_CEB4,
+                0xF654_7998_C199_5DBD,
+                0x778A_468F_507A_6034,
+                0x0205_5993_1F7F_8103,
+            ]
+        )
+
+        self.assertTrue(Fp.conditional_select(a, b, Choice(1)).eq(a))
+        self.assertTrue(Fp.conditional_select(a, b, Choice(0)).eq(b))
 
 
 if __name__ == "__main__":

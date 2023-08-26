@@ -7,6 +7,7 @@ from src.utils import (
     wrapping_sub_u64,
     array_to_number,
     CtOption,
+    Choice,
 )
 
 
@@ -497,6 +498,14 @@ class Fp:
         # overflow (and so this element is not lexicographically larger
         # than its negation) and then negate it.
         return not ((borrow & ((1 << 8) - 1)) & 1)
+
+    def conditional_select(a, b, choice: Choice):
+        return Fp(
+            [
+                choice.value * a.array[i] + (1 - choice.value) * b.array[i]
+                for i in range(len(a.array))
+            ]
+        )
 
 
 # p = 4002409555221667393417789825735904156556882819939007885332058136124031650490837864442687629129015664037894272559787

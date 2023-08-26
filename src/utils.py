@@ -4,6 +4,13 @@ class CtOption:
         self.choice = choice
 
 
+class Choice:
+    def __init__(self, value):
+        if value != 0 and value != 1:
+            raise ValueError("Choice must be either 0 or 1")
+        self.value = value
+
+
 def sbb(a, b, borrow):
     """
     The function `sbb` subtracts `b` and `borrow` from `a` and returns the lower 64 bits of the result
