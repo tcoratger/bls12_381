@@ -21,6 +21,10 @@ class TestG1(unittest.TestCase):
         a = G1Affine.identity()
         self.assertTrue(a.x.is_zero() and a.y.eq(Fp.one()) and a.infinity.value == 1)
 
+    def test_is_identity(self):
+        a = G1Affine.identity()
+        self.assertTrue(a.is_identity())
+
     def test_default(self):
         a = G1Affine.default()
         self.assertTrue(a.eq(G1Affine.identity()))
@@ -61,3 +65,13 @@ class TestConditionnalSelect(unittest.TestCase):
         self.assertTrue(
             case1.x.eq(d.x) and case1.y.eq(d.y) and case1.infinity.value == 0
         )
+
+
+class TestIsOnCurve(unittest.TestCase):
+    def test_is_on_curve(self):
+        self.assertTrue(G1Affine.identity().is_on_curve())
+        self.assertTrue(G1Affine.generator().is_on_curve())
+
+
+if __name__ == "__main__":
+    unittest.main()
