@@ -1,4 +1,12 @@
-from src.utils import sbb, mac, adc, wrapping_mul_u64, wrapping_sub_u64, CtOption
+from src.utils import (
+    sbb,
+    mac,
+    adc,
+    wrapping_mul_u64,
+    wrapping_sub_u64,
+    CtOption,
+    Choice,
+)
 from src.fp import Fp
 from src.fp2 import Fp2
 from src.fp6 import Fp6
@@ -144,3 +152,9 @@ class Fp12:
         )
 
         return Fp12(c0, c1)
+
+    def conditional_select(a, b, choice: Choice):
+        return Fp12(
+            Fp6.conditional_select(a.c0, b.c0, choice),
+            Fp6.conditional_select(a.c1, b.c1, choice),
+        )
