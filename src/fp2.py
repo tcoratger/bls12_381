@@ -223,7 +223,7 @@ class Fp2:
             False,
         )
 
-    def conditional_select(a, b, choice):
+    def conditional_select(a, b, choice: Choice):
         return Fp2(
             Fp.conditional_select(a.c0, b.c0, choice),
             Fp.conditional_select(a.c1, b.c1, choice),

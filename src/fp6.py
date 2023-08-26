@@ -1,4 +1,12 @@
-from src.utils import sbb, mac, adc, wrapping_mul_u64, wrapping_sub_u64, CtOption
+from src.utils import (
+    sbb,
+    mac,
+    adc,
+    wrapping_mul_u64,
+    wrapping_sub_u64,
+    CtOption,
+    Choice,
+)
 from src.fp import Fp
 from src.fp2 import Fp2
 
@@ -212,3 +220,10 @@ class Fp6:
 
     def sub(self, rhs):
         return Fp6(self.c0 - rhs.c0, self.c1 - rhs.c1, self.c2 - rhs.c2)
+
+    def conditional_select(a, b, choice: Choice):
+        return Fp6(
+            Fp2.conditional_select(a.c0, b.c0, choice),
+            Fp2.conditional_select(a.c1, b.c1, choice),
+            Fp2.conditional_select(a.c2, b.c2, choice),
+        )
