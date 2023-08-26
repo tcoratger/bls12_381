@@ -130,6 +130,9 @@ class G1Projective:
     def identity():
         return G1Projective(Fp.zero(), Fp.one(), Fp.zero())
 
+    def is_identity(self):
+        return self.z.is_zero()
+
     def default():
         return G1Projective.identity()
 

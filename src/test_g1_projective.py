@@ -21,6 +21,10 @@ class TestG1(unittest.TestCase):
         a = G1Projective.identity()
         self.assertTrue(a.x.is_zero() and a.y.eq(Fp.one()) and a.z.is_zero())
 
+    def test_is_identity(self):
+        a = G1Projective.identity()
+        self.assertTrue(a.is_identity())
+
 
 class TestIsOnCurve(unittest.TestCase):
     def test_is_on_curve(self):
