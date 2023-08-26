@@ -11,7 +11,7 @@ from src.fp6 import (
 from src.fp12 import (
     Fp12,
 )
-from src.g1 import G1Affine, G1Projective
+from src.g1 import G1Affine, G1Projective, BETA
 import random
 from src.utils import array_to_number, Choice
 
@@ -71,6 +71,13 @@ class TestIsOnCurve(unittest.TestCase):
     def test_is_on_curve(self):
         self.assertTrue(G1Affine.identity().is_on_curve())
         self.assertTrue(G1Affine.generator().is_on_curve())
+
+
+class TestBeta(unittest.TestCase):
+    def test_beta(self):
+        self.assertFalse(BETA.eq(Fp.one()))
+        self.assertFalse((BETA * BETA).eq(Fp.one()))
+        self.assertTrue((BETA * BETA * BETA).eq(Fp.one()))
 
 
 if __name__ == "__main__":
