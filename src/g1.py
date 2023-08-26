@@ -176,6 +176,24 @@ class G1Projective:
             Fp.one(),
         )
 
+    def eq(self, other):
+        # Is (xz, yz, z) equal to (x'z', y'z', z') when converted to affine?
+
+        x1 = self.x * other.z
+        x2 = other.x * self.z
+
+        y1 = self.y * other.z
+        y2 = other.y * self.z
+
+        self_is_zero = self.z.is_zero()
+        other_is_zero = other.z.is_zero()
+
+        # Both point at infinity
+        return (self_is_zero and other_is_zero) or (
+            (not self_is_zero and not other_is_zero) and x1.eq(x2) and y1.eq(y2)
+        )
+        # Neither point at infinity, coordinates are the same
+
 
 B = Fp(
     [
