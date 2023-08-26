@@ -62,7 +62,7 @@ class G1Affine:
 
         tmp = G1Affine(x, y, Choice(0))
 
-        return G1Affine(
+        return G1Affine.conditional_select(
             tmp, G1Affine.identity(), Choice(1) if zinv.is_zero() else Choice(0)
         )
 

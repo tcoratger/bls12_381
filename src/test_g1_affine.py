@@ -90,5 +90,35 @@ class TestEquality(unittest.TestCase):
         self.assertFalse(b.eq(a))
 
 
+class TestFromProjective(unittest.TestCase):
+    def test_projective_to_affine(self):
+        a = G1Projective.generator()
+        b = G1Projective.identity()
+
+        self.assertTrue(G1Affine.from_g1_projective(a).is_on_curve())
+        self.assertTrue(G1Affine.from_g1_projective(a).is_identity())
+        self.assertTrue(G1Affine.from_g1_projective(b).is_on_curve())
+        self.assertTrue(G1Affine.from_g1_projective(b).is_on_curve())
+
+        z = Fp(
+            [
+                0xBA7A_FA1F_9A6F_E250,
+                0xFA0F_5B59_5EAF_E731,
+                0x3BDC_4776_94C3_06E7,
+                0x2149_BE4B_3949_FA24,
+                0x64AA_6E06_49B2_078C,
+                0x12B1_08AC_3364_3C3E,
+            ]
+        )
+
+        c = G1Projective(
+            a.x * z,
+            a.y * z,
+            z,
+        )
+
+        self.assertTrue(G1Affine.from_g1_projective(c).eq(G1Affine.generator()))
+
+
 if __name__ == "__main__":
     unittest.main()
