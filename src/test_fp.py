@@ -765,8 +765,8 @@ class TestConditionnalSelect(unittest.TestCase):
             ]
         )
 
-        self.assertTrue(Fp.conditional_select(a, b, Choice(1)).eq(a))
-        self.assertTrue(Fp.conditional_select(a, b, Choice(0)).eq(b))
+        self.assertTrue(Fp.conditional_select(a, b, Choice(1)).eq(b))
+        self.assertTrue(Fp.conditional_select(a, b, Choice(0)).eq(a))
 
 
 if __name__ == "__main__":

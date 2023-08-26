@@ -502,7 +502,7 @@ class Fp:
     def conditional_select(a, b, choice: Choice):
         return Fp(
             [
-                choice.value * a.array[i] + (1 - choice.value) * b.array[i]
+                choice.value * b.array[i] + (1 - choice.value) * a.array[i]
                 for i in range(len(a.array))
             ]
         )
