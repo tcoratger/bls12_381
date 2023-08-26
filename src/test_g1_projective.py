@@ -100,3 +100,14 @@ class TestEquality(unittest.TestCase):
         self.assertFalse(a.eq(b))
         self.assertFalse(a.eq(c))
         self.assertFalse(b.eq(c))
+
+
+class TestFromAffine(unittest.TestCase):
+    def test_affine_to_projective(self):
+        a = G1Affine.generator()
+        b = G1Affine.identity()
+
+        self.assertTrue(G1Projective.from_g1_affine(a).is_on_curve())
+        self.assertFalse(G1Projective.from_g1_affine(a).is_identity())
+        self.assertTrue(G1Projective.from_g1_affine(b).is_on_curve())
+        self.assertTrue(G1Projective.from_g1_affine(b).is_identity())

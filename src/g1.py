@@ -136,6 +136,11 @@ class G1Projective:
     def default():
         return G1Projective.identity()
 
+    def from_g1_affine(p):
+        return G1Projective(
+            p.x, p.y, Fp.conditional_select(Fp.one(), Fp.zero(), p.infinity)
+        )
+
     def conditional_select(a, b, choice: Choice):
         return G1Projective(
             Fp.conditional_select(a.x, b.x, choice),
