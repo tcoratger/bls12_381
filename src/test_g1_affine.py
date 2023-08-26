@@ -80,5 +80,15 @@ class TestBeta(unittest.TestCase):
         self.assertTrue((BETA * BETA * BETA).eq(Fp.one()))
 
 
+class TestEquality(unittest.TestCase):
+    def test_affine_point_equality(self):
+        a = G1Affine.generator()
+        b = G1Affine.identity()
+        self.assertTrue(a.eq(a))
+        self.assertTrue(b.eq(b))
+        self.assertFalse(a.eq(b))
+        self.assertFalse(b.eq(a))
+
+
 if __name__ == "__main__":
     unittest.main()

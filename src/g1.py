@@ -44,9 +44,9 @@ class G1Affine:
     # 1. infinity is set on both
     # 2. infinity is not set on both, and their coordinates are equal
     def eq(self, other):
-        return (self.infinity and other.infinity) or (
-            not self.infinity
-            and not other.infinity
+        return (self.infinity.value and other.infinity.value) or (
+            not self.infinity.value
+            and not other.infinity.value
             and self.x.eq(other.x)
             and self.y.eq(other.y)
         )
