@@ -171,3 +171,20 @@ class TestProjectiveAddition(unittest.TestCase):
         self.assertFalse(c.is_identity())
         self.assertTrue(c.is_on_curve())
         self.assertTrue(c.eq(G1Projective.generator()))
+
+    def test_projective_addition4(self):
+        a = G1Projective.generator().double().double()  # 4P
+        b = G1Projective.generator().double()  # 2P
+
+        c = a + b
+
+        d = G1Projective.generator()
+
+        for _ in range(5):
+            d += G1Projective.generator()
+
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+        self.assertFalse(d.is_identity())
+        self.assertTrue(d.is_on_curve())
+        self.assertTrue(c.eq(d))

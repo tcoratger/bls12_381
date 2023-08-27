@@ -244,6 +244,34 @@ class G1Projective:
 
         return G1Projective(x3, y3, z3)
 
+    # Computes the doubling of this point.
+    def double(self):
+        # Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
+        t0 = self.y.square()
+        z3 = t0 + t0
+        z3 = z3 + z3
+        z3 = z3 + z3
+        t1 = self.y * self.z
+        t2 = self.z.square()
+        t2 = mul_by_3b(t2)
+        x3 = t2 * z3
+        y3 = t0 + t2
+        z3 = t1 * z3
+        t1 = t2 + t2
+        t2 = t1 + t2
+        t0 = t0 - t2
+        y3 = t0 * y3
+        y3 = x3 + y3
+        t1 = self.x * self.y
+        x3 = t0 * t1
+        x3 = x3 + x3
+
+        tmp = G1Projective(x3, y3, z3)
+
+        return G1Projective.conditional_select(
+            tmp, G1Projective.identity(), Choice(1) if self.is_identity() else Choice(0)
+        )
+
 
 B = Fp(
     [
