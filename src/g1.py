@@ -24,6 +24,9 @@ class G1Affine:
     def __neg__(self):
         return self.neg()
 
+    def __add__(self, rhs):
+        return add_mixed(rhs, self)
+
     def identity():
         return G1Affine(Fp.zero(), Fp.one(), Choice(1))
 
@@ -127,6 +130,9 @@ class G1Projective:
         self.y = y
         self.z = z
 
+    def __add__(self, rhs):
+        return self.add(rhs)
+
     def identity():
         return G1Projective(Fp.zero(), Fp.one(), Fp.zero())
 
@@ -199,6 +205,45 @@ class G1Projective:
         )
         # Neither point at infinity, coordinates are the same
 
+    # Adds this point to another point.
+    def add(self, rhs):
+        # Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
+        t0 = self.x * rhs.x
+        t1 = self.y * rhs.y
+        t2 = self.z * rhs.z
+        t3 = self.x + self.y
+        t4 = rhs.x + rhs.y
+        t3 = t3 * t4
+        t4 = t0 + t1
+        t3 = t3 - t4
+        t4 = self.y + self.z
+        x3 = rhs.y + rhs.z
+        t4 = t4 * x3
+        x3 = t1 + t2
+        t4 = t4 - x3
+        x3 = self.x + self.z
+        y3 = rhs.x + rhs.z
+        x3 = x3 * y3
+        y3 = t0 + t2
+        y3 = x3 - y3
+        x3 = t0 + t0
+        t0 = x3 + t0
+        t2 = mul_by_3b(t2)
+        z3 = t1 + t2
+        t1 = t1 - t2
+        y3 = mul_by_3b(y3)
+        x3 = t4 * y3
+        t2 = t3 * t1
+        x3 = t2 - x3
+        y3 = y3 * t0
+        t1 = t1 * z3
+        y3 = t1 + y3
+        t0 = t0 * t3
+        z3 = z3 * t4
+        z3 = z3 + t0
+
+        return G1Projective(x3, y3, z3)
+
 
 B = Fp(
     [
@@ -210,3 +255,45 @@ B = Fp(
         0x09D6_4551_3D83_DE7E,
     ]
 )
+
+
+# Adds this point to another point in the affine model.
+def add_mixed(self: G1Projective, rhs: G1Affine):
+    # Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
+    t0 = self.x * rhs.x
+    t1 = self.y * rhs.y
+    t3 = rhs.x + rhs.y
+    t4 = self.x + self.y
+    t3 = t3 * t4
+    t4 = t0 + t1
+    t3 = t3 - t4
+    t4 = rhs.y * self.z
+    t4 = t4 + self.y
+    y3 = rhs.x * self.z
+    y3 = y3 + self.x
+    x3 = t0 + t0
+    t0 = x3 + t0
+    t2 = mul_by_3b(self.z)
+    z3 = t1 + t2
+    t1 = t1 - t2
+    y3 = mul_by_3b(y3)
+    x3 = t4 * y3
+    t2 = t3 * t1
+    x3 = t2 - x3
+    y3 = y3 * t0
+    t1 = t1 * z3
+    y3 = t1 + y3
+    t0 = t0 * t3
+    z3 = z3 * t4
+    z3 = z3 + t0
+
+    tmp = G1Projective(x3, y3, z3)
+
+    return G1Projective.conditional_select(tmp, self, rhs.is_identity())
+
+
+def mul_by_3b(a: Fp):
+    a = a + a  # 2
+    a = a + a  # 4
+
+    return a + a + a  # 12

@@ -111,3 +111,63 @@ class TestFromAffine(unittest.TestCase):
         self.assertFalse(G1Projective.from_g1_affine(a).is_identity())
         self.assertTrue(G1Projective.from_g1_affine(b).is_on_curve())
         self.assertTrue(G1Projective.from_g1_affine(b).is_identity())
+
+
+class TestProjectiveAddition(unittest.TestCase):
+    def test_projective_addition1(self):
+        a = G1Projective.identity()
+        b = G1Projective.identity()
+
+        c = a + b
+
+        self.assertTrue(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+
+    def test_projective_addition2(self):
+        a = G1Projective.identity()
+        b = G1Projective.generator()
+
+        z = Fp(
+            [
+                0xBA7A_FA1F_9A6F_E250,
+                0xFA0F_5B59_5EAF_E731,
+                0x3BDC_4776_94C3_06E7,
+                0x2149_BE4B_3949_FA24,
+                0x64AA_6E06_49B2_078C,
+                0x12B1_08AC_3364_3C3E,
+            ]
+        )
+
+        b.x = b.x * z
+        b.y = b.y * z
+        b.z = z
+
+        c = a + b
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+        self.assertTrue(c.eq(G1Projective.generator()))
+
+    def test_projective_addition3(self):
+        a = G1Projective.identity()
+        b = G1Projective.generator()
+
+        z = Fp(
+            [
+                0xBA7A_FA1F_9A6F_E250,
+                0xFA0F_5B59_5EAF_E731,
+                0x3BDC_4776_94C3_06E7,
+                0x2149_BE4B_3949_FA24,
+                0x64AA_6E06_49B2_078C,
+                0x12B1_08AC_3364_3C3E,
+            ]
+        )
+
+        b.x = b.x * z
+        b.y = b.y * z
+        b.z = z
+
+        c = b + a
+
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+        self.assertTrue(c.eq(G1Projective.generator()))
