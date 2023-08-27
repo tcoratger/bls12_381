@@ -131,7 +131,14 @@ class G1Projective:
         self.z = z
 
     def __add__(self, rhs):
-        return self.add(rhs)
+        if isinstance(rhs, G1Projective):
+            return self.add(rhs)
+        elif isinstance(rhs, G1Affine):
+            return add_mixed(self, rhs)
+        elif isinstance(self, G1Affine):
+            return add_mixed(rhs, self)
+        else:
+            raise ValueError("Unsupported type for addition")
 
     def identity():
         return G1Projective(Fp.zero(), Fp.one(), Fp.zero())

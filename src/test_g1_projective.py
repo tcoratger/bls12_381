@@ -241,3 +241,136 @@ class TestProjectiveAddition(unittest.TestCase):
 
         self.assertFalse(c.is_identity())
         self.assertTrue(c.is_on_curve())
+
+
+class TestMixedAddition(unittest.TestCase):
+    def test_mixed_addition1(self):
+        a = G1Affine.identity()
+        b = G1Projective.identity()
+
+        c = a + b
+
+        self.assertTrue(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+
+    def test_mixed_addition2(self):
+        a = G1Affine.identity()
+        b = G1Projective.generator()
+
+        z = Fp(
+            [
+                0xBA7A_FA1F_9A6F_E250,
+                0xFA0F_5B59_5EAF_E731,
+                0x3BDC_4776_94C3_06E7,
+                0x2149_BE4B_3949_FA24,
+                0x64AA_6E06_49B2_078C,
+                0x12B1_08AC_3364_3C3E,
+            ]
+        )
+
+        b.x = b.x * z
+        b.y = b.y * z
+        b.z = z
+
+        c = a + b
+
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+        self.assertTrue(c.eq(G1Projective.generator()))
+
+    def test_mixed_addition3(self):
+        a = G1Affine.identity()
+        b = G1Projective.generator()
+
+        z = Fp(
+            [
+                0xBA7A_FA1F_9A6F_E250,
+                0xFA0F_5B59_5EAF_E731,
+                0x3BDC_4776_94C3_06E7,
+                0x2149_BE4B_3949_FA24,
+                0x64AA_6E06_49B2_078C,
+                0x12B1_08AC_3364_3C3E,
+            ]
+        )
+
+        b.x = b.x * z
+        b.y = b.y * z
+        b.z = z
+
+        c = b + a
+
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+        self.assertTrue(c.eq(G1Projective.generator()))
+
+    def test_mixed_addition4(self):
+        a = G1Projective.generator().double().double()  # 4P
+        b = G1Projective.generator().double()  # 2P
+
+        c = a + b
+
+        d = G1Projective.generator()
+
+        for _ in range(5):
+            d += G1Projective.generator()
+
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
+        self.assertFalse(d.is_identity())
+        self.assertTrue(d.is_on_curve())
+        self.assertTrue(c.eq(d))
+
+    def test_projective_addition_degenerate(self):
+        beta = Fp(
+            [
+                0xCD03_C9E4_8671_F071,
+                0x5DAB_2246_1FCD_A5D2,
+                0x5870_42AF_D385_1B95,
+                0x8EB6_0EBE_01BA_CB9E,
+                0x03F9_7D6E_83D0_50D2,
+                0x18F0_2065_5463_8741,
+            ]
+        )
+        beta = beta.square()
+        a = G1Projective.generator().double().double()
+        b = G1Projective(a.x * beta, -a.y, a.z)
+
+        a = G1Affine.from_g1_projective(a)
+
+        self.assertTrue(a.is_on_curve())
+        self.assertTrue(b.is_on_curve())
+
+        c = a + b
+
+        self.assertTrue(
+            G1Affine.from_g1_projective(c).eq(
+                G1Affine.from_g1_projective(
+                    G1Projective(
+                        Fp(
+                            [
+                                0x29E1_E987_EF68_F2D0,
+                                0xC5F3_EC53_1DB0_3233,
+                                0xACD6_C4B6_CA19_730F,
+                                0x18AD_9E82_7BC2_BAB7,
+                                0x46E3_B2C5_785C_C7A9,
+                                0x07E5_71D4_2D22_DDD6,
+                            ]
+                        ),
+                        Fp(
+                            [
+                                0x94D1_17A7_E5A5_39E7,
+                                0x8E17_EF67_3D4B_5D22,
+                                0x9D74_6AAF_508A_33EA,
+                                0x8C6D_883D_2516_C9A2,
+                                0x0BC3_B8D5_FB04_47F7,
+                                0x07BF_A4C7_210F_4F44,
+                            ]
+                        ),
+                        Fp.one(),
+                    )
+                )
+            )
+        )
+
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
