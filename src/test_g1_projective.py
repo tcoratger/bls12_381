@@ -374,3 +374,45 @@ class TestMixedAddition(unittest.TestCase):
 
         self.assertFalse(c.is_identity())
         self.assertTrue(c.is_on_curve())
+
+
+class TestDoubling(unittest.TestCase):
+    def test_doubling1(self):
+        tmp = G1Projective.identity().double()
+
+        self.assertTrue(tmp.is_identity())
+        self.assertTrue(tmp.is_on_curve())
+
+    def test_doubling2(self):
+        tmp = G1Projective.generator().double()
+
+        self.assertFalse(tmp.is_identity())
+        self.assertTrue(tmp.is_on_curve())
+
+        self.assertTrue(
+            G1Affine.from_g1_projective(tmp).eq(
+                G1Affine(
+                    Fp(
+                        [
+                            0x53E9_78CE_58A9_BA3C,
+                            0x3EA0_583C_4F3D_65F9,
+                            0x4D20_BB47_F001_2960,
+                            0xA54C_664A_E5B2_B5D9,
+                            0x26B5_52A3_9D7E_B21F,
+                            0x0008_895D_26E6_8785,
+                        ]
+                    ),
+                    Fp(
+                        [
+                            0x7011_0B32_9829_3940,
+                            0xDA33_C539_3F1F_6AFC,
+                            0xB86E_DFD1_6A5A_A785,
+                            0xAEC6_D1C9_E7B1_C895,
+                            0x25CF_C2B5_22D1_1720,
+                            0x0636_1C83_F8D0_9B15,
+                        ]
+                    ),
+                    Choice(0),
+                )
+            )
+        )
