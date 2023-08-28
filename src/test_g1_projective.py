@@ -416,3 +416,15 @@ class TestDoubling(unittest.TestCase):
                 )
             )
         )
+
+
+class TestNegSub(unittest.TestCase):
+    def test_affine_negation_and_subtraction(self):
+        a = G1Affine.generator()
+
+        self.assertTrue((G1Projective.from_g1_affine(a) + (-a)).is_identity())
+        self.assertTrue(
+            (G1Projective.from_g1_affine(a) + (-a)).eq(
+                G1Projective.from_g1_affine(a) - a
+            )
+        )

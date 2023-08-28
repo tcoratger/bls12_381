@@ -140,6 +140,12 @@ class G1Projective:
         else:
             raise ValueError("Unsupported type for addition")
 
+    def __neg__(self):
+        return self.neg()
+
+    def __sub__(self, other):
+        return self.sub(other)
+
     def identity():
         return G1Projective(Fp.zero(), Fp.one(), Fp.zero())
 
@@ -160,6 +166,12 @@ class G1Projective:
             Fp.conditional_select(a.y, b.y, choice),
             Fp.conditional_select(a.z, b.z, choice),
         )
+
+    def neg(self):
+        return G1Projective(self.x, -self.y, self.z)
+
+    def sub(self, rhs):
+        return self + (-rhs)
 
     # Returns true if this point is on the curve. This should always return
     # true unless an "unchecked" API was used.
