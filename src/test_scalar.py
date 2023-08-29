@@ -45,6 +45,14 @@ class TestEquality(unittest.TestCase):
         self.assertFalse(Scalar.one().eq(R2))
 
 
+class TestZero(unittest.TestCase):
+    def test_zero(self):
+        self.assertTrue(Scalar.zero().eq(-Scalar.zero()))
+        self.assertTrue(Scalar.zero().eq(Scalar.zero() + Scalar.zero()))
+        self.assertTrue(Scalar.zero().eq(Scalar.zero() - Scalar.zero()))
+        self.assertTrue(Scalar.zero().eq(Scalar.zero() * Scalar.zero()))
+
+
 class TestConstants(unittest.TestCase):
     def test_constants(self):
         self.assertTrue(

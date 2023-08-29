@@ -30,6 +30,9 @@ class Scalar:
     def __mul__(self, other):
         return self.mul(other)
 
+    def __neg__(self):
+        return self.neg()
+
     def from_u64(val):
         return Scalar([val, 0, 0, 0])
 
@@ -139,6 +142,29 @@ class Scalar:
         t6, t7 = mac(t6, self.array[3], rhs.array[3], carry)
 
         return Scalar.montgomery_reduce(t0, t1, t2, t3, t4, t5, t6, t7)
+
+    def neg(self):
+        d0, borrow = sbb(MODULUS.array[0], self.array[0], 0)
+        d1, borrow = sbb(MODULUS.array[1], self.array[1], borrow)
+        d2, borrow = sbb(MODULUS.array[2], self.array[2], borrow)
+        d3, _ = sbb(MODULUS.array[3], self.array[3], borrow)
+
+        # Let's use a mask if `self` was zero, which would mean
+        # the result of the subtraction is p.
+        mask = wrapping_sub_u64(
+            int(((self.array[0] | self.array[1] | self.array[2] | self.array[3]) == 0))
+            & ((1 << 64) - 1),
+            1,
+        )
+
+        return Scalar(
+            [
+                d0 & mask,
+                d1 & mask,
+                d2 & mask,
+                d3 & mask,
+            ]
+        )
 
 
 # Constant representing the modulus
