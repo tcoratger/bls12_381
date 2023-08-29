@@ -85,38 +85,38 @@ class Scalar:
         return Scalar([d0, d1, d2, d3])
 
     @staticmethod
-    def montgomery_reduce(t0, t1, t2, t3, t4, t5, t6, t7):
+    def montgomery_reduce(r0, r1, r2, r3, r4, r5, r6, r7):
         # The Montgomery reduction here is based on Algorithm 14.32 in
         # Handbook of Applied Cryptography
         # <http://cacr.uwaterloo.ca/hac/about/chap14.pdf>.
 
-        k = wrapping_mul_u64(t0, INV)
-        _, carry = mac(t0, k, MODULUS.array[0], 0)
-        r1, carry = mac(t1, k, MODULUS.array[1], carry)
-        r2, carry = mac(t2, k, MODULUS.array[2], carry)
-        r3, carry = mac(t3, k, MODULUS.array[3], carry)
-        r4, carry2 = adc(t4, 0, carry)
+        k = wrapping_mul_u64(r0, INV)
+        _, carry = mac(r0, k, MODULUS.array[0], 0)
+        r1, carry = mac(r1, k, MODULUS.array[1], carry)
+        r2, carry = mac(r2, k, MODULUS.array[2], carry)
+        r3, carry = mac(r3, k, MODULUS.array[3], carry)
+        r4, carry2 = adc(r4, 0, carry)
 
         k = wrapping_mul_u64(r1, INV)
         _, carry = mac(r1, k, MODULUS.array[0], 0)
         r2, carry = mac(r2, k, MODULUS.array[1], carry)
         r3, carry = mac(r3, k, MODULUS.array[2], carry)
         r4, carry = mac(r4, k, MODULUS.array[3], carry)
-        r5, carry2 = adc(t5, carry2, carry)
+        r5, carry2 = adc(r5, carry2, carry)
 
         k = wrapping_mul_u64(r2, INV)
         _, carry = mac(r2, k, MODULUS.array[0], 0)
         r3, carry = mac(r3, k, MODULUS.array[1], carry)
         r4, carry = mac(r4, k, MODULUS.array[2], carry)
         r5, carry = mac(r5, k, MODULUS.array[3], carry)
-        r6, carry2 = adc(t6, carry2, carry)
+        r6, carry2 = adc(r6, carry2, carry)
 
         k = wrapping_mul_u64(r3, INV)
         _, carry = mac(r3, k, MODULUS.array[0], 0)
         r4, carry = mac(r4, k, MODULUS.array[1], carry)
         r5, carry = mac(r5, k, MODULUS.array[2], carry)
         r6, carry = mac(r6, k, MODULUS.array[3], carry)
-        r7, _ = adc(t7, carry2, carry)
+        r7, _ = adc(r7, carry2, carry)
 
         return Scalar([r4, r5, r6, r7]).sub(MODULUS)
 
@@ -165,6 +165,28 @@ class Scalar:
                 d3 & mask,
             ]
         )
+
+    def to_bytes(self):
+        # Turn into canonical form by computing
+        # (a.R) / R = a
+        tmp = Scalar.montgomery_reduce(
+            self.array[0],
+            self.array[1],
+            self.array[2],
+            self.array[3],
+            0,
+            0,
+            0,
+            0,
+        )
+
+        res = []
+        res[0:8] = tmp.array[0].to_bytes(8, "little")
+        res[8:16] = tmp.array[1].to_bytes(8, "little")
+        res[16:24] = tmp.array[2].to_bytes(8, "little")
+        res[24:32] = tmp.array[3].to_bytes(8, "little")
+
+        return res
 
 
 # Constant representing the modulus

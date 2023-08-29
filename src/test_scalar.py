@@ -79,6 +79,187 @@ class TestSubtraction(unittest.TestCase):
         self.assertTrue(tmp.eq(tmp2))
 
 
+class TestToBytes(unittest.TestCase):
+    def test_to_bytes(self):
+        self.assertEqual(
+            Scalar.zero().to_bytes(),
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ],
+        )
+        self.assertEqual(
+            Scalar.one().to_bytes(),
+            [
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ],
+        )
+        self.assertEqual(
+            R2.to_bytes(),
+            [
+                254,
+                255,
+                255,
+                255,
+                1,
+                0,
+                0,
+                0,
+                2,
+                72,
+                3,
+                0,
+                250,
+                183,
+                132,
+                88,
+                245,
+                79,
+                188,
+                236,
+                239,
+                79,
+                140,
+                153,
+                111,
+                5,
+                197,
+                172,
+                89,
+                177,
+                36,
+                24,
+            ],
+        )
+        self.assertEqual(
+            (-Scalar.one()).to_bytes(),
+            [
+                0,
+                0,
+                0,
+                0,
+                255,
+                255,
+                255,
+                255,
+                254,
+                91,
+                254,
+                255,
+                2,
+                164,
+                189,
+                83,
+                5,
+                216,
+                161,
+                9,
+                8,
+                216,
+                57,
+                51,
+                72,
+                125,
+                157,
+                41,
+                83,
+                167,
+                237,
+                115,
+            ],
+        )
+
+
+# class TestMultiplication(unittest.TestCase):
+#     def test_multiplication(self):
+#         cur = LARGEST
+
+#         test = 0
+
+#         for _ in range(1):
+#             tmp = cur
+#             tmp *= cur
+
+#             tmp2 = Scalar.zero()
+#             for byte in reversed(cur.to_bytes()):
+#                 for i in range(7, -1, -1):
+#                     b = (byte >> i) & 1 == 1
+
+#                     test += 1
+
+#                     print(hex(array_to_number(tmp2.array)), b, test)
+#                     tmp3 = tmp2
+#                     tmp2 += tmp3
+
+#                     # if b:
+#                     #     tmp2 += cur
+
+#             self.assertTrue(tmp.eq(tmp2))
+
+#             cur += LARGEST
+
+
 class TestConstants(unittest.TestCase):
     def test_constants(self):
         self.assertTrue(
