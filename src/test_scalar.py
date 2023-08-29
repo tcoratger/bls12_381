@@ -65,6 +65,20 @@ class TestNegation(unittest.TestCase):
         self.assertTrue(tmp.eq(LARGEST))
 
 
+class TestSubtraction(unittest.TestCase):
+    def test_subtraction(self):
+        tmp = LARGEST
+        tmp -= LARGEST
+        self.assertTrue(tmp.eq(Scalar.zero()))
+
+        tmp = Scalar.zero()
+        tmp -= LARGEST
+
+        tmp2 = MODULUS
+        tmp2 -= LARGEST
+        self.assertTrue(tmp.eq(tmp2))
+
+
 class TestConstants(unittest.TestCase):
     def test_constants(self):
         self.assertTrue(
