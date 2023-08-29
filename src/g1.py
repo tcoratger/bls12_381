@@ -146,6 +146,9 @@ class G1Projective:
     def __sub__(self, other):
         return self.sub(other)
 
+    def __mul__(self, other):
+        return self.multiply(other)
+
     def identity():
         return G1Projective(Fp.zero(), Fp.one(), Fp.zero())
 
@@ -290,6 +293,29 @@ class G1Projective:
         return G1Projective.conditional_select(
             tmp, G1Projective.identity(), Choice(1) if self.is_identity() else Choice(0)
         )
+
+    def multiply(self, by):
+        acc = G1Projective.identity()
+
+        # This is a simple double-and-add implementation of point
+        # multiplication, moving from most significant to least
+        # significant bit of the scalar.
+
+        # We skip the leading bit because it's always unset for Fq
+        # elements.
+        bits = (
+            Choice(1) if (byte >> i) & 1 else Choice(0)
+            for byte in reversed(by)
+            for i in range(8)
+        )
+        next(bits)
+
+        for bit in bits:
+            acc = acc.double()
+            if bit:
+                acc = G1Projective.conditional_select(acc, acc + self, Choice(1))
+
+        return acc
 
 
 B = Fp(
