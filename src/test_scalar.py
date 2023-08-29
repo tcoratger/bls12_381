@@ -11,7 +11,7 @@ from src.fp6 import (
 from src.fp12 import (
     Fp12,
 )
-from src.scalar import Scalar, MODULUS, TWO_INV, ROOT_OF_UNITY, R2
+from src.scalar import Scalar, MODULUS, TWO_INV, ROOT_OF_UNITY, R2, LARGEST
 from src.g1 import G1Affine, G1Projective
 import random
 from src.utils import array_to_number, Choice
@@ -51,6 +51,18 @@ class TestZero(unittest.TestCase):
         self.assertTrue(Scalar.zero().eq(Scalar.zero() + Scalar.zero()))
         self.assertTrue(Scalar.zero().eq(Scalar.zero() - Scalar.zero()))
         self.assertTrue(Scalar.zero().eq(Scalar.zero() * Scalar.zero()))
+
+
+class TestNegation(unittest.TestCase):
+    def test_negation(self):
+        tmp = -LARGEST
+        self.assertTrue(tmp.eq(Scalar([1, 0, 0, 0])))
+
+        tmp = -Scalar.zero()
+        self.assertTrue(tmp.eq(Scalar.zero()))
+
+        tmp = -Scalar([1, 0, 0, 0])
+        self.assertTrue(tmp.eq(LARGEST))
 
 
 class TestConstants(unittest.TestCase):

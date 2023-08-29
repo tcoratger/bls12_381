@@ -273,3 +273,12 @@ DELTA = Scalar(
         0x6185_D066_27C0_67CB,
     ]
 )
+
+LARGEST = Scalar(
+    [
+        0xFFFF_FFFF_0000_0000,
+        0x53BD_A402_FFFE_5BFE,
+        0x3339_D808_09A1_D805,
+        0x73ED_A753_299D_7D48,
+    ]
+)
