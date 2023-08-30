@@ -188,6 +188,31 @@ class Scalar:
 
         return res
 
+    def from_bytes(bytes):
+        tmp = Scalar([0, 0, 0, 0])
+
+        tmp.array[0] = int.from_bytes(bytes[0:8], byteorder="little")
+        tmp.array[1] = int.from_bytes(bytes[8:16], byteorder="little")
+        tmp.array[2] = int.from_bytes(bytes[16:24], byteorder="little")
+        tmp.array[3] = int.from_bytes(bytes[24:32], byteorder="little")
+
+        # Try to subtract the modulus
+        _, borrow = sbb(tmp.array[0], MODULUS.array[0], 0)
+        _, borrow = sbb(tmp.array[1], MODULUS.array[1], borrow)
+        _, borrow = sbb(tmp.array[2], MODULUS.array[2], borrow)
+        _, borrow = sbb(tmp.array[3], MODULUS.array[3], borrow)
+
+        # If the element is smaller than MODULUS then the
+        # subtraction will underflow, producing a borrow value
+        # of 0xffff...ffff. Otherwise, it'll be zero.
+        is_some = (int(borrow) & 0xFF) & 1
+
+        # Convert to Montgomery form by computing
+        # (a.R^0 * R^2) / R = a.R
+        tmp *= R2
+
+        return CtOption(tmp, Choice(1) if is_some else Choice(0))
+
 
 # Constant representing the modulus
 # q = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
