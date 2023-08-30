@@ -11,7 +11,7 @@ from src.fp6 import (
 from src.fp12 import (
     Fp12,
 )
-from src.scalar import Scalar, MODULUS, TWO_INV, ROOT_OF_UNITY, R2, LARGEST
+from src.scalar import Scalar, MODULUS, TWO_INV, ROOT_OF_UNITY, R2, LARGEST, R, R3
 from src.g1 import G1Affine, G1Projective
 import random
 from src.utils import array_to_number, Choice
@@ -543,6 +543,51 @@ class TestFromBytes(unittest.TestCase):
                 ]
             ).choice.value,
             Choice(0).value,
+        )
+
+
+class TestFromU512(unittest.TestCase):
+    def test_from_u512_zero(self):
+        self.assertTrue(
+            Scalar.zero().eq(
+                Scalar.from_u512(
+                    [
+                        MODULUS.array[0],
+                        MODULUS.array[1],
+                        MODULUS.array[2],
+                        MODULUS.array[3],
+                        0,
+                        0,
+                        0,
+                        0,
+                    ]
+                )
+            )
+        )
+
+    def test_from_u512_r(self):
+        self.assertTrue(R.eq(Scalar.from_u512([1, 0, 0, 0, 0, 0, 0, 0])))
+
+    def test_from_u512_r2(self):
+        self.assertTrue(R2.eq(Scalar.from_u512([0, 0, 0, 0, 1, 0, 0, 0])))
+
+    def test_from_u512_max(self):
+        max_u64 = 0xFFFF_FFFF_FFFF_FFFF
+        self.assertTrue(
+            (R3 - R).eq(
+                Scalar.from_u512(
+                    [
+                        max_u64,
+                        max_u64,
+                        max_u64,
+                        max_u64,
+                        max_u64,
+                        max_u64,
+                        max_u64,
+                        max_u64,
+                    ]
+                )
+            )
         )
 
 

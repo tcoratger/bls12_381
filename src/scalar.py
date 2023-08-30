@@ -213,6 +213,27 @@ class Scalar:
 
         return CtOption(tmp, Choice(1) if is_some else Choice(0))
 
+    def from_u512(limbs):
+        # We reduce an arbitrary 512-bit number by decomposing it into two 256-bit digits
+        # with the higher bits multiplied by 2^256. Thus, we perform two reductions
+
+        # 1. the lower bits are multiplied by R^2, as normal
+        # 2. the upper bits are multiplied by R^2 * 2^256 = R^3
+
+        # and computing their sum in the field. It remains to see that arbitrary 256-bit
+        # numbers can be placed into Montgomery form safely using the reduction. The
+        # reduction works so long as the product is less than R=2^256 multiplied by
+        # the modulus. This holds because for any `c` smaller than the modulus, we have
+        # that (2^256 - 1)*c is an acceptable product for the reduction. Therefore, the
+        # reduction always works so long as `c` is in the field; in this case it is either the
+        # constant `R2` or `R3`.
+
+        d0 = Scalar([limbs[0], limbs[1], limbs[2], limbs[3]])
+        d1 = Scalar([limbs[4], limbs[5], limbs[6], limbs[7]])
+
+        # Convert to Montgomery form
+        return d0 * R2 + d1 * R3
+
 
 # Constant representing the modulus
 # q = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
