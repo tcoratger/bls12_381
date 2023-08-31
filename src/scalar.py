@@ -34,7 +34,7 @@ class Scalar:
         return self.neg()
 
     def from_u64(val):
-        return Scalar([val, 0, 0, 0])
+        return Scalar([val, 0, 0, 0]) * R2
 
     def eq(self, other):
         return (
@@ -281,6 +281,110 @@ class Scalar:
         # Perform Montgomery reduction
         return Scalar.montgomery_reduce(t0, t1, t2, t3, t4, t5, t6, t7)
 
+    def invert(self):
+        def square_assign_multi(n, num_times):
+            for _ in range(num_times):
+                n = n.square()
+
+        t0 = self.square()
+        t1 = t0 * self
+        t16 = t0.square()
+        t6 = t16.square()
+        t5 = t6 * t0
+        t0 = t6 * t16
+        t12 = t5 * t16
+        t2 = t6.square()
+        t7 = t5 * t6
+        t15 = t0 * t5
+        t17 = t12.square()
+        t1 *= t17
+        t3 = t7 * t2
+        t8 = t1 * t17
+        t4 = t8 * t2
+        t9 = t8 * t7
+        t7 = t4 * t5
+        t11 = t4 * t17
+        t5 = t9 * t17
+        t14 = t7 * t15
+        t13 = t11 * t12
+        t12 = t11 * t17
+        t15 *= t12
+        t16 *= t15
+        t3 *= t16
+        t17 *= t3
+        t0 *= t17
+        t6 *= t0
+        t2 *= t6
+        square_assign_multi(t0, 8)
+        t0 *= t17
+        square_assign_multi(t0, 9)
+        t0 *= t16
+        square_assign_multi(t0, 9)
+        t0 *= t15
+        square_assign_multi(t0, 9)
+        t0 *= t15
+        square_assign_multi(t0, 7)
+        t0 *= t14
+        square_assign_multi(t0, 7)
+        t0 *= t13
+        square_assign_multi(t0, 10)
+        t0 *= t12
+        square_assign_multi(t0, 9)
+        t0 *= t11
+        square_assign_multi(t0, 8)
+        t0 *= t8
+        square_assign_multi(t0, 8)
+        t0 *= self
+        square_assign_multi(t0, 14)
+        t0 *= t9
+        square_assign_multi(t0, 10)
+        t0 *= t8
+        square_assign_multi(t0, 15)
+        t0 *= t7
+        square_assign_multi(t0, 10)
+        t0 *= t6
+        square_assign_multi(t0, 8)
+        t0 *= t5
+        square_assign_multi(t0, 16)
+        t0 *= t3
+        square_assign_multi(t0, 8)
+        t0 *= t2
+        square_assign_multi(t0, 7)
+        t0 *= t4
+        square_assign_multi(t0, 9)
+        t0 *= t2
+        square_assign_multi(t0, 8)
+        t0 *= t3
+        square_assign_multi(t0, 8)
+        t0 *= t2
+        square_assign_multi(t0, 8)
+        t0 *= t2
+        square_assign_multi(t0, 8)
+        t0 *= t2
+        square_assign_multi(t0, 8)
+        t0 *= t3
+        square_assign_multi(t0, 8)
+        t0 *= t2
+        square_assign_multi(t0, 8)
+        t0 *= t2
+        square_assign_multi(t0, 5)
+        t0 *= t1
+        square_assign_multi(t0, 5)
+        t0 *= t1
+
+        return CtOption(t0, Choice(1) if not self.eq(Scalar.zero()) else Choice(0))
+
+    def pow(self, by):
+        res = Scalar.one()
+        for e in reversed(by):
+            for i in range(63, -1, -1):
+                res = res.square()
+                tmp = res * self
+                res = Scalar.conditional_select(
+                    tmp, res, Choice(0) if (((e >> i) & 0x1) & 0xFF) else Choice(1)
+                )
+        return res
+
 
 # Constant representing the modulus
 # q = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
@@ -396,4 +500,8 @@ LARGEST = Scalar(
         0x3339_D808_09A1_D805,
         0x73ED_A753_299D_7D48,
     ]
+)
+
+ONE = Scalar(
+    [8589934590, 6378425256633387010, 11064306276430008309, 1739710354780652911]
 )

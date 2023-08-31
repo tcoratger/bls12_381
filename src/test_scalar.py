@@ -21,16 +21,20 @@ from src.scalar import (
     R,
     R3,
     ROOT_OF_UNITY_INV,
+    ONE,
+    INV,
+    S,
+    DELTA,
 )
 from src.g1 import G1Affine, G1Projective
 import random
-from src.utils import array_to_number, Choice
+from src.utils import array_to_number, Choice, wrapping_mul_u64
 
 
 class TestBasics(unittest.TestCase):
     def test_from_u64(self):
         a = Scalar.from_u64(10)
-        self.assertEqual(a.array, [10, 0, 0, 0])
+        self.assertTrue(a.eq(Scalar([10, 0, 0, 0]) * R2))
 
     def test_eq(self):
         a = Scalar([2, 4, 43, 17])
@@ -833,12 +837,48 @@ class TestSquaring(unittest.TestCase):
             cur += LARGEST
 
 
+# class TestInversion(unittest.TestCase):
+#     def test_inversion(self):
+#         self.assertEqual(Scalar.zero().invert().choice.value, Choice(0).value)
+#         self.assertTrue(Scalar.one().invert().value.eq(Scalar.one()))
+#         self.assertTrue((-Scalar.one()).invert().value.eq(-Scalar.one()))
+
+#         tmp = R2
+
+#         print("number R2", array_to_number(R2.array))
+
+#         for _ in range(1):
+#             tmp2 = tmp.invert().value
+
+#             print("number R2 invert", array_to_number(tmp.invert().value.array))
+
+#             tmp2 *= tmp
+
+#             print("résultat", array_to_number(tmp2.array))
+
+#             self.assertTrue(tmp2.eq(Scalar.one()))
+
+#             tmp += R2
+
+
 class TestConstants(unittest.TestCase):
     def test_constants(self):
         self.assertTrue(
             array_to_number(MODULUS.array)
             == 0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001
         )
-        self.assertTrue((Scalar.from_u64(2) * TWO_INV).eq(Scalar.from_u64(1)))
-        # print((ROOT_OF_UNITY * ROOT_OF_UNITY_INV).array, (Scalar.from_u64(1)).array)
-        # self.assertTrue((ROOT_OF_UNITY * ROOT_OF_UNITY_INV).eq(Scalar.from_u64(1)))
+        self.assertTrue((Scalar.from_u64(2) * TWO_INV).eq(ONE))
+        self.assertTrue((ROOT_OF_UNITY * ROOT_OF_UNITY_INV).eq(ONE))
+        # ROOT_OF_UNITY^{2^s} mod m == 1
+        self.assertTrue(ROOT_OF_UNITY.pow([1 << S, 0, 0, 0]).eq(ONE))
+        # DELTA^{t} mod m == 1
+        self.assertTrue(
+            DELTA.pow(
+                [
+                    0xFFFE_5BFE_FFFF_FFFF,
+                    0x09A1_D805_53BD_A402,
+                    0x299D_7D48_3339_D808,
+                    0x0000_0000_73ED_A753,
+                ]
+            ).eq(ONE)
+        )
