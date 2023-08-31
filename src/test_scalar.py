@@ -753,6 +753,28 @@ class TestFromBytesWide(unittest.TestCase):
         )
 
 
+class TestAddition(unittest.TestCase):
+    def test_addition(self):
+        tmp = LARGEST
+        tmp += LARGEST
+        self.assertTrue(
+            tmp.eq(
+                Scalar(
+                    [
+                        0xFFFF_FFFE_FFFF_FFFF,
+                        0x53BD_A402_FFFE_5BFE,
+                        0x3339_D808_09A1_D805,
+                        0x73ED_A753_299D_7D48,
+                    ]
+                )
+            )
+        )
+
+        tmp = LARGEST
+        tmp += Scalar([1, 0, 0, 0])
+        self.assertTrue(tmp.eq(Scalar.zero()))
+
+
 # class TestMultiplication(unittest.TestCase):
 #     def test_multiplication(self):
 #         cur = LARGEST
