@@ -11,7 +11,17 @@ from src.fp6 import (
 from src.fp12 import (
     Fp12,
 )
-from src.scalar import Scalar, MODULUS, TWO_INV, ROOT_OF_UNITY, R2, LARGEST, R, R3
+from src.scalar import (
+    Scalar,
+    MODULUS,
+    TWO_INV,
+    ROOT_OF_UNITY,
+    R2,
+    LARGEST,
+    R,
+    R3,
+    ROOT_OF_UNITY_INV,
+)
 from src.g1 import G1Affine, G1Projective
 import random
 from src.utils import array_to_number, Choice
@@ -799,6 +809,30 @@ class TestMultiplication(unittest.TestCase):
             cur += LARGEST
 
 
+class TestSquaring(unittest.TestCase):
+    def test_squaring(self):
+        cur = LARGEST
+
+        for _ in range(100):
+            tmp = cur
+            tmp = tmp.square()
+
+            tmp2 = Scalar.zero()
+            for byte in reversed(cur.to_bytes()):
+                for i in range(7, -1, -1):
+                    b = (byte >> i) & (1 & 0xFF) == (1 & 0xFF)
+
+                    tmp3 = tmp2
+                    tmp2 += tmp3
+
+                    if b:
+                        tmp2 += cur
+
+            self.assertTrue(tmp.eq(tmp2))
+
+            cur += LARGEST
+
+
 class TestConstants(unittest.TestCase):
     def test_constants(self):
         self.assertTrue(
@@ -806,4 +840,5 @@ class TestConstants(unittest.TestCase):
             == 0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001
         )
         self.assertTrue((Scalar.from_u64(2) * TWO_INV).eq(Scalar.from_u64(1)))
-        # self.assertTrue((ROOT_OF_UNITY * ROOT_OF_UNITY).eq(Scalar.from_u64(1)))
+        # print((ROOT_OF_UNITY * ROOT_OF_UNITY_INV).array, (Scalar.from_u64(1)).array)
+        # self.assertTrue((ROOT_OF_UNITY * ROOT_OF_UNITY_INV).eq(Scalar.from_u64(1)))
