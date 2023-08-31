@@ -775,33 +775,28 @@ class TestAddition(unittest.TestCase):
         self.assertTrue(tmp.eq(Scalar.zero()))
 
 
-# class TestMultiplication(unittest.TestCase):
-#     def test_multiplication(self):
-#         cur = LARGEST
+class TestMultiplication(unittest.TestCase):
+    def test_multiplication(self):
+        cur = LARGEST
 
-#         test = 0
+        for _ in range(100):
+            tmp = cur
+            tmp *= cur
 
-#         for _ in range(1):
-#             tmp = cur
-#             tmp *= cur
+            tmp2 = Scalar.zero()
+            for byte in reversed(cur.to_bytes()):
+                for i in range(7, -1, -1):
+                    b = (byte >> i) & (1 & 0xFF) == (1 & 0xFF)
 
-#             tmp2 = Scalar.zero()
-#             for byte in reversed(cur.to_bytes()):
-#                 for i in range(7, -1, -1):
-#                     b = (byte >> i) & 1 == 1
+                    tmp3 = tmp2
+                    tmp2 += tmp3
 
-#                     test += 1
+                    if b:
+                        tmp2 += cur
 
-#                     print(hex(array_to_number(tmp2.array)), b, test)
-#                     tmp3 = tmp2
-#                     tmp2 += tmp3
+            self.assertTrue(tmp.eq(tmp2))
 
-#                     # if b:
-#                     #     tmp2 += cur
-
-#             self.assertTrue(tmp.eq(tmp2))
-
-#             cur += LARGEST
+            cur += LARGEST
 
 
 class TestConstants(unittest.TestCase):
