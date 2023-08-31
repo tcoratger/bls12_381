@@ -234,6 +234,22 @@ class Scalar:
         # Convert to Montgomery form
         return d0 * R2 + d1 * R3
 
+    # Converts a 512-bit little endian integer into
+    # a `Scalar` by reducing by the modulus.
+    def from_bytes_wide(bytes):
+        return Scalar.from_u512(
+            [
+                int.from_bytes(bytes[0:8], byteorder="little"),
+                int.from_bytes(bytes[8:16], byteorder="little"),
+                int.from_bytes(bytes[16:24], byteorder="little"),
+                int.from_bytes(bytes[24:32], byteorder="little"),
+                int.from_bytes(bytes[32:40], byteorder="little"),
+                int.from_bytes(bytes[40:48], byteorder="little"),
+                int.from_bytes(bytes[48:56], byteorder="little"),
+                int.from_bytes(bytes[56:64], byteorder="little"),
+            ]
+        )
+
 
 # Constant representing the modulus
 # q = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
