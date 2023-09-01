@@ -407,6 +407,9 @@ class Scalar:
     def from_raw(val):
         return Scalar(val) * R2
 
+    def double(self):
+        return self + self
+
 
 # Constant representing the modulus
 # q = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001

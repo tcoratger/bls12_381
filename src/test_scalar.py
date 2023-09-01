@@ -924,3 +924,16 @@ class TestFromRaw(unittest.TestCase):
         )
         self.assertTrue(Scalar.from_raw(MODULUS.array).eq(Scalar.zero()))
         self.assertTrue(Scalar.from_raw([1, 0, 0, 0]).eq(R))
+
+
+class TestDouble(unittest.TestCase):
+    def test_double(self):
+        a = Scalar.from_raw(
+            [
+                0x1FFF_3231_233F_FFFD,
+                0x4884_B7FA_0003_4802,
+                0x998C_4FEF_ECBC_4FF3,
+                0x1824_B159_ACC5_0562,
+            ]
+        )
+        self.assertTrue(a.double().eq(a + a))
