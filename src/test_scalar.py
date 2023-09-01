@@ -837,28 +837,21 @@ class TestSquaring(unittest.TestCase):
             cur += LARGEST
 
 
-# class TestInversion(unittest.TestCase):
-#     def test_inversion(self):
-#         self.assertEqual(Scalar.zero().invert().choice.value, Choice(0).value)
-#         self.assertTrue(Scalar.one().invert().value.eq(Scalar.one()))
-#         self.assertTrue((-Scalar.one()).invert().value.eq(-Scalar.one()))
+class TestInversion(unittest.TestCase):
+    def test_inversion(self):
+        self.assertEqual(Scalar.zero().invert().choice.value, Choice(0).value)
+        self.assertTrue(Scalar.one().invert().value.eq(Scalar.one()))
+        self.assertTrue((-Scalar.one()).invert().value.eq(-Scalar.one()))
 
-#         tmp = R2
+        tmp = R2
 
-#         print("number R2", array_to_number(R2.array))
+        for _ in range(100):
+            tmp2 = tmp.invert().value
+            tmp2 *= tmp
 
-#         for _ in range(1):
-#             tmp2 = tmp.invert().value
+            self.assertTrue(tmp2.eq(Scalar.one()))
 
-#             print("number R2 invert", array_to_number(tmp.invert().value.array))
-
-#             tmp2 *= tmp
-
-#             print("résultat", array_to_number(tmp2.array))
-
-#             self.assertTrue(tmp2.eq(Scalar.one()))
-
-#             tmp += R2
+            tmp += R2
 
 
 class TestConstants(unittest.TestCase):

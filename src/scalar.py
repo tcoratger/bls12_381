@@ -286,6 +286,9 @@ class Scalar:
             for _ in range(num_times):
                 n = n.square()
 
+            return n
+
+        # found using https://github.com/kwantam/addchain
         t0 = self.square()
         t1 = t0 * self
         t16 = t0.square()
@@ -315,61 +318,61 @@ class Scalar:
         t0 *= t17
         t6 *= t0
         t2 *= t6
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t17
-        square_assign_multi(t0, 9)
+        t0 = square_assign_multi(t0, 9)
         t0 *= t16
-        square_assign_multi(t0, 9)
+        t0 = square_assign_multi(t0, 9)
         t0 *= t15
-        square_assign_multi(t0, 9)
+        t0 = square_assign_multi(t0, 9)
         t0 *= t15
-        square_assign_multi(t0, 7)
+        t0 = square_assign_multi(t0, 7)
         t0 *= t14
-        square_assign_multi(t0, 7)
+        t0 = square_assign_multi(t0, 7)
         t0 *= t13
-        square_assign_multi(t0, 10)
+        t0 = square_assign_multi(t0, 10)
         t0 *= t12
-        square_assign_multi(t0, 9)
+        t0 = square_assign_multi(t0, 9)
         t0 *= t11
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t8
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= self
-        square_assign_multi(t0, 14)
+        t0 = square_assign_multi(t0, 14)
         t0 *= t9
-        square_assign_multi(t0, 10)
+        t0 = square_assign_multi(t0, 10)
         t0 *= t8
-        square_assign_multi(t0, 15)
+        t0 = square_assign_multi(t0, 15)
         t0 *= t7
-        square_assign_multi(t0, 10)
+        t0 = square_assign_multi(t0, 10)
         t0 *= t6
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t5
-        square_assign_multi(t0, 16)
+        t0 = square_assign_multi(t0, 16)
         t0 *= t3
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t2
-        square_assign_multi(t0, 7)
+        t0 = square_assign_multi(t0, 7)
         t0 *= t4
-        square_assign_multi(t0, 9)
+        t0 = square_assign_multi(t0, 9)
         t0 *= t2
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t3
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t2
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t2
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t2
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t3
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t2
-        square_assign_multi(t0, 8)
+        t0 = square_assign_multi(t0, 8)
         t0 *= t2
-        square_assign_multi(t0, 5)
+        t0 = square_assign_multi(t0, 5)
         t0 *= t1
-        square_assign_multi(t0, 5)
+        t0 = square_assign_multi(t0, 5)
         t0 *= t1
 
         return CtOption(t0, Choice(1) if not self.eq(Scalar.zero()) else Choice(0))
