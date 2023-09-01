@@ -853,6 +853,30 @@ class TestInversion(unittest.TestCase):
 
             tmp += R2
 
+    def test_invert_is_pow(self):
+        q_minus_2 = [
+            0xFFFF_FFFE_FFFF_FFFF,
+            0x53BD_A402_FFFE_5BFE,
+            0x3339_D808_09A1_D805,
+            0x73ED_A753_299D_7D48,
+        ]
+        r1 = R
+        r2 = R
+        r3 = R
+
+        for _ in range(100):
+            r1 = r1.invert().value
+            r2 = r2.pow_vartime(q_minus_2)
+            r3 = r3.pow(q_minus_2)
+
+            self.assertTrue(r1.eq(r2))
+            self.assertTrue(r2.eq(r3))
+
+            # Add R so we check something different next time around
+            r1 += R
+            r2 = r1
+            r3 = r1
+
 
 class TestConstants(unittest.TestCase):
     def test_constants(self):

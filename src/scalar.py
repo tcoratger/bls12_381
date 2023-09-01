@@ -388,6 +388,22 @@ class Scalar:
                 )
         return res
 
+    # Exponentiates `self` by `by`, where `by` is a
+    # little-endian order integer exponent.
+
+    # **This operation is variable time with respect
+    # to the exponent.** If the exponent is fixed,
+    # this operation is effectively constant time.
+    def pow_vartime(self, by):
+        res = Scalar.one()
+        for e in reversed(by):
+            for i in range(63, -1, -1):
+                res = res.square()
+
+                if ((e >> i) & 1) == 1:
+                    res *= self
+        return res
+
 
 # Constant representing the modulus
 # q = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
