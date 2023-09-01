@@ -899,3 +899,28 @@ class TestConstants(unittest.TestCase):
                 ]
             ).eq(ONE)
         )
+
+
+class TestFromRaw(unittest.TestCase):
+    def test_from_raw(self):
+        self.assertTrue(
+            Scalar.from_raw(
+                [
+                    0x0001_FFFF_FFFD,
+                    0x5884_B7FA_0003_4802,
+                    0x998C_4FEF_ECBC_4FF5,
+                    0x1824_B159_ACC5_056F,
+                ]
+            ).eq(
+                Scalar.from_raw(
+                    [
+                        0xFFFF_FFFF_FFFF_FFFF,
+                        0xFFFF_FFFF_FFFF_FFFF,
+                        0xFFFF_FFFF_FFFF_FFFF,
+                        0xFFFF_FFFF_FFFF_FFFF,
+                    ]
+                )
+            )
+        )
+        self.assertTrue(Scalar.from_raw(MODULUS.array).eq(Scalar.zero()))
+        self.assertTrue(Scalar.from_raw([1, 0, 0, 0]).eq(R))
