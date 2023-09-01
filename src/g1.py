@@ -112,19 +112,6 @@ class G1Affine:
         )
 
 
-# A nontrivial third root of unity in Fp
-BETA = Fp(
-    [
-        0x30F1_361B_798A_64E8,
-        0xF3B8_DDAB_7ECE_5A2A,
-        0x16A8_CA3A_C615_77F7,
-        0xC26A_2FF8_74FD_029B,
-        0x3636_B766_6070_1C6E,
-        0x051B_A4AB_241B_6160,
-    ]
-)
-
-
 # This is an element of $\mathbb{G}_1$ represented in the projective coordinate space.
 class G1Projective:
     def __init__(self, x: Fp, y: Fp, z: Fp):
