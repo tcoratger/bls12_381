@@ -10,6 +10,7 @@ from src.utils import (
     BLS_X,
     BLS_X_IS_NEGATIVE,
 )
+from src.scalar import Scalar
 
 
 # This is an element of $\mathbb{G}_1$ represented in the affine coordinate space.
@@ -28,6 +29,12 @@ class G1Affine:
 
     def __add__(self, rhs):
         return add_mixed(rhs, self)
+
+    def __mul__(lhs, rhs):
+        if isinstance(rhs, Scalar):
+            return G1Projective.from_g1_affine(lhs).multiply(rhs.to_bytes())
+        else:
+            return G1Projective.from_g1_affine(lhs).multiply(rhs)
 
     def identity():
         return G1Affine(Fp.zero(), Fp.one(), Choice(1))
@@ -111,6 +118,28 @@ class G1Affine:
             Choice(0),
         )
 
+    def endomorphism(self):
+        # Endomorphism of the points on the curve.
+        # endomorphism_p(x,y) = (BETA * x, y)
+        # where BETA is a non-trivial cubic root of unity in Fq.
+        res = self
+        res.x *= BETA
+        return res
+
+    # Returns true if this point is free of an $h$-torsion component, and so it
+    # exists within the $q$-order subgroup $\mathbb{G}_1$. This should always return true
+    # unless an "unchecked" API was used.
+    def is_torsion_free(self):
+        # Algorithm from Section 6 of https://eprint.iacr.org/2021/1130
+        # Updated proof of correctness in https://eprint.iacr.org/2022/352
+
+        # Check that endomorphism_p(P) == -[x^2] P
+        minus_x_squared_times_p = (
+            G1Projective.from_g1_affine(self).mul_by_x().mul_by_x().neg()
+        )
+        endomorphism_p = self.endomorphism()
+        return minus_x_squared_times_p.eq(G1Projective.from_g1_affine(endomorphism_p))
+
 
 # This is an element of $\mathbb{G}_1$ represented in the projective coordinate space.
 class G1Projective:
@@ -135,8 +164,13 @@ class G1Projective:
     def __sub__(self, other):
         return self.sub(other)
 
-    def __mul__(self, other):
-        return self.multiply(other)
+    def __mul__(lhs, rhs):
+        if isinstance(rhs, Scalar):
+            return lhs.multiply(rhs.to_bytes())
+        elif isinstance(lhs, Scalar):
+            return rhs.multiply(lhs.to_bytes())
+        else:
+            return lhs.multiply(rhs)
 
     def identity():
         return G1Projective(Fp.zero(), Fp.one(), Fp.zero())
@@ -292,17 +326,19 @@ class G1Projective:
 
         # We skip the leading bit because it's always unset for Fq
         # elements.
-        bits = (
-            Choice(1) if (byte >> i) & 1 else Choice(0)
-            for byte in reversed(by)
-            for i in range(8)
-        )
-        next(bits)
 
-        for bit in bits:
-            acc = acc.double()
-            if bit:
-                acc = G1Projective.conditional_select(acc, acc + self, Choice(1))
+        first_bit = True
+
+        for byte in reversed(by):
+            for i in range(7, -1, -1):
+                if first_bit:
+                    first_bit = False
+                    continue
+                bit = (byte >> i) & 1
+                acc = acc.double()
+                acc = G1Projective.conditional_select(
+                    acc, acc + self, Choice(1) if bit else Choice(0)
+                )
 
         return acc
 
@@ -310,20 +346,23 @@ class G1Projective:
         xself = G1Projective.identity()
 
         # # NOTE: in BLS12-381 we can just skip the first bit.
-        # x = BLS_X >> 1
-        # tmp = self
+        x = BLS_X >> 1
+        tmp = self
 
-        # while x != 0:
-        #     tmp = tmp.double()
-        #     if x % 2 == 1:
-        #         xself += tmp
-        #     x >>= 1
+        while x != 0:
+            tmp = tmp.double()
+            if x % 2 == 1:
+                xself += tmp
+            x >>= 1
 
-        # # finally, flip the sign
-        # if BLS_X_IS_NEGATIVE:
-        #     xself = -xself
+        # finally, flip the sign
+        if BLS_X_IS_NEGATIVE:
+            xself = -xself
 
         return xself
+
+    def clear_cofactor(self):
+        return self - self.mul_by_x()
 
 
 B = Fp(

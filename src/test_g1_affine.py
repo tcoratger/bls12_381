@@ -14,6 +14,7 @@ from src.fp12 import (
 from src.g1 import G1Affine, G1Projective, BETA
 import random
 from src.utils import array_to_number, Choice
+from src.scalar import Scalar
 
 
 class TestG1(unittest.TestCase):
@@ -118,6 +119,80 @@ class TestFromProjective(unittest.TestCase):
         )
 
         self.assertTrue(G1Affine.from_g1_projective(c).eq(G1Affine.generator()))
+
+
+class TestConditionallySelect(unittest.TestCase):
+    def test_conditionally_select_affine(self):
+        a = G1Affine.generator()
+        b = G1Affine.identity()
+
+        self.assertTrue(G1Affine.conditional_select(a, b, Choice(0)).eq(a))
+        self.assertTrue(G1Affine.conditional_select(a, b, Choice(1)).eq(b))
+
+
+class TestNegSub(unittest.TestCase):
+    def test_affine_negation_and_subtraction(self):
+        a = G1Affine.generator()
+
+        self.assertTrue((G1Projective.from_g1_affine(a) + (-a)).is_identity())
+        self.assertTrue(
+            (G1Projective.from_g1_affine(a) + (-a)).eq(
+                G1Projective.from_g1_affine(a) - a
+            )
+        )
+
+
+class TestScalarMultiplication(unittest.TestCase):
+    def test_affine_scalar_multiplication(self):
+        g = G1Affine.generator()
+        a = Scalar.from_raw(
+            [
+                0x2B56_8297_A56D_A71C,
+                0xD8C3_9ECB_0EF3_75D1,
+                0x435C_38DA_67BF_BF96,
+                0x8088_A050_26B6_59B2,
+            ]
+        )
+        b = Scalar.from_raw(
+            [
+                0x785F_DD9B_26EF_8B85,
+                0xC997_F258_3769_5C18,
+                0x4C8D_BC39_E7B7_56C1,
+                0x70D9_B6CC_6D87_DF20,
+            ]
+        )
+        c = a * b
+        self.assertTrue((G1Affine.from_g1_projective(g * a) * b).eq(g * c))
+
+
+class TestTorsionFree(unittest.TestCase):
+    def test_is_torsion_free(self):
+        a = G1Affine(
+            Fp(
+                [
+                    0x0ABA_F895_B97E_43C8,
+                    0xBA4C_6432_EB9B_61B0,
+                    0x1250_6F52_ADFE_307F,
+                    0x7502_8C34_3933_6B72,
+                    0x8474_4F05_B8E9_BD71,
+                    0x113D_554F_B095_54F7,
+                ]
+            ),
+            Fp(
+                [
+                    0x73E9_0E88_F5CF_01C0,
+                    0x3700_7B65_DD31_97E2,
+                    0x5CF9_A199_2F0D_7C78,
+                    0x4F83_C10B_9EB3_330D,
+                    0xF6A6_3F6F_07F6_0961,
+                    0x0C53_B5B9_7E63_4DF3,
+                ]
+            ),
+            Choice(0),
+        )
+        self.assertFalse(a.is_torsion_free())
+        self.assertTrue(G1Affine.identity().is_torsion_free())
+        self.assertTrue(G1Affine.generator().is_torsion_free())
 
 
 if __name__ == "__main__":

@@ -177,6 +177,15 @@ class TestFromAffine(unittest.TestCase):
         self.assertTrue(G1Projective.from_g1_affine(b).is_identity())
 
 
+class TestConditionallySelect(unittest.TestCase):
+    def test_conditionally_select_projective(self):
+        a = G1Projective.generator()
+        b = G1Projective.identity()
+
+        self.assertTrue(G1Projective.conditional_select(a, b, Choice(0)).eq(a))
+        self.assertTrue(G1Projective.conditional_select(a, b, Choice(1)).eq(b))
+
+
 class TestProjectiveAddition(unittest.TestCase):
     def test_projective_addition1(self):
         a = G1Projective.identity()
@@ -483,26 +492,101 @@ class TestDoubling(unittest.TestCase):
 
 
 class TestNegSub(unittest.TestCase):
-    def test_affine_negation_and_subtraction(self):
-        a = G1Affine.generator()
+    def test_projective_negation_and_subtraction(self):
+        a = G1Projective.generator().double()
 
-        self.assertTrue((G1Projective.from_g1_affine(a) + (-a)).is_identity())
-        self.assertTrue(
-            (G1Projective.from_g1_affine(a) + (-a)).eq(
-                G1Projective.from_g1_affine(a) - a
-            )
+        self.assertTrue((a + (-a)).is_identity())
+        self.assertTrue((a + (-a)).eq(G1Projective.identity()))
+
+
+class TestScalarMultiplication(unittest.TestCase):
+    def test_projective_scalar_multiplication(self):
+        g = G1Projective.generator()
+        a = Scalar.from_raw(
+            [
+                0x2B56_8297_A56D_A71C,
+                0xD8C3_9ECB_0EF3_75D1,
+                0x435C_38DA_67BF_BF96,
+                0x8088_A050_26B6_59B2,
+            ]
+        )
+        b = Scalar.from_raw(
+            [
+                0x785F_DD9B_26EF_8B85,
+                0xC997_F258_3769_5C18,
+                0x4C8D_BC39_E7B7_56C1,
+                0x70D9_B6CC_6D87_DF20,
+            ]
+        )
+        c = a * b
+        self.assertTrue(((g * a) * b).eq(g * c))
+
+
+class TestMulByX(unittest.TestCase):
+    def test_mul_by_x(self):
+        # multiplying by `x` a point in G1 is the same as multiplying by
+        # the equivalent scalar.
+        generator = G1Projective.generator()
+        x = -Scalar.from_u64(BLS_X) if (BLS_X_IS_NEGATIVE) else Scalar.from_u64(BLS_X)
+
+        self.assertTrue(generator.mul_by_x().eq(generator * x))
+
+        point = G1Projective.generator() * Scalar.from_u64(42)
+        self.assertTrue(point.mul_by_x().eq(point * x))
+
+
+class TestClearCoFactor(unittest.TestCase):
+    def test_clear_cofactor(self):
+        generator = G1Projective.generator()
+        self.assertTrue(generator.clear_cofactor().is_on_curve())
+
+        id = G1Projective.identity()
+        self.assertTrue(id.clear_cofactor().is_on_curve())
+
+        z = Fp(
+            [
+                0x3D2D1C670671394E,
+                0x0EE3A800A2F7C1CA,
+                0x270F4F21DA2E5050,
+                0xE02840A53F1BE768,
+                0x55DEBEB597512690,
+                0x08BD25353DC8F791,
+            ]
         )
 
+        point = G1Projective(
+            Fp(
+                [
+                    0x48AF5FF540C817F0,
+                    0xD73893ACAF379D5A,
+                    0xE6C43584E18E023C,
+                    0x1EDA39C30F188B3E,
+                    0xF618C6D3CCC0F8D8,
+                    0x0073542CD671E16C,
+                ]
+            )
+            * z,
+            Fp(
+                [
+                    0x57BF8BE79461D0BA,
+                    0xFC61459CEE3547C3,
+                    0x0D23567DF1EF147B,
+                    0x0EE187BCCE1D9B64,
+                    0xB0C8CFBE9DC8FDC1,
+                    0x1328661767EF368B,
+                ]
+            ),
+            z.square() * z,
+        )
 
-# class TestMulByX(unittest.TestCase):
-#     def test_mul_by_x(self):
-#         # multiplying by `x` a point in G1 is the same as multiplying by
-#         # the equivalent scalar.
-#         generator = G1Projective.generator()
-#         x = -Scalar.from_u64(BLS_X) if (BLS_X_IS_NEGATIVE) else Scalar.from_u64(BLS_X)
+        self.assertTrue(point.is_on_curve())
+        self.assertFalse(G1Affine.from_g1_projective(point).is_torsion_free())
 
-#         generator.mul_by_x()
+        cleared_point = point.clear_cofactor()
+        self.assertTrue(cleared_point.is_on_curve())
+        self.assertTrue(G1Affine.from_g1_projective(cleared_point).is_torsion_free())
 
-#         x * generator
-
-#         # self.assertTrue(generator.mul_by_x().eq(generator * x))
+        # in BLS12-381 the cofactor in G1 can be
+        # cleared multiplying by (1-x)
+        h_eff = Scalar.from_u64(1) + Scalar.from_u64(BLS_X)
+        self.assertTrue(point.clear_cofactor().eq(point * h_eff))
