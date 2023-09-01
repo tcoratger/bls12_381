@@ -11,9 +11,10 @@ from src.fp6 import (
 from src.fp12 import (
     Fp12,
 )
-from src.g1 import G1Affine, G1Projective
+from src.g1 import G1Affine, G1Projective, BETA
 import random
-from src.utils import array_to_number, Choice
+from src.utils import array_to_number, Choice, BLS_X, BLS_X_IS_NEGATIVE
+from src.scalar import Scalar
 
 
 class TestG1(unittest.TestCase):
@@ -24,6 +25,69 @@ class TestG1(unittest.TestCase):
     def test_is_identity(self):
         a = G1Projective.identity()
         self.assertTrue(a.is_identity())
+
+
+class TestBeta(unittest.TestCase):
+    def test_beta(self):
+        self.assertTrue(
+            BETA.eq(
+                Fp.from_bytes(
+                    [
+                        0x00,
+                        0x00,
+                        0x00,
+                        0x00,
+                        0x00,
+                        0x00,
+                        0x00,
+                        0x00,
+                        0x5F,
+                        0x19,
+                        0x67,
+                        0x2F,
+                        0xDF,
+                        0x76,
+                        0xCE,
+                        0x51,
+                        0xBA,
+                        0x69,
+                        0xC6,
+                        0x07,
+                        0x6A,
+                        0x0F,
+                        0x77,
+                        0xEA,
+                        0xDD,
+                        0xB3,
+                        0xA9,
+                        0x3B,
+                        0xE6,
+                        0xF8,
+                        0x96,
+                        0x88,
+                        0xDE,
+                        0x17,
+                        0xD8,
+                        0x13,
+                        0x62,
+                        0x0A,
+                        0x00,
+                        0x02,
+                        0x2E,
+                        0x01,
+                        0xFF,
+                        0xFF,
+                        0xFF,
+                        0xFE,
+                        0xFF,
+                        0xFE,
+                    ]
+                ).value
+            )
+        )
+        self.assertFalse(BETA.eq(Fp.one()))
+        self.assertFalse((BETA * BETA).eq(Fp.one()))
+        self.assertTrue((BETA * BETA * BETA).eq(Fp.one()))
 
 
 class TestIsOnCurve(unittest.TestCase):
@@ -428,3 +492,17 @@ class TestNegSub(unittest.TestCase):
                 G1Projective.from_g1_affine(a) - a
             )
         )
+
+
+# class TestMulByX(unittest.TestCase):
+#     def test_mul_by_x(self):
+#         # multiplying by `x` a point in G1 is the same as multiplying by
+#         # the equivalent scalar.
+#         generator = G1Projective.generator()
+#         x = -Scalar.from_u64(BLS_X) if (BLS_X_IS_NEGATIVE) else Scalar.from_u64(BLS_X)
+
+#         generator.mul_by_x()
+
+#         x * generator
+
+#         # self.assertTrue(generator.mul_by_x().eq(generator * x))

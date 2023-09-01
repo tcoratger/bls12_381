@@ -104,3 +104,8 @@ def array_to_number(a):
     for num in reversed(a):
         combined_value = (combined_value << 64) | num
     return combined_value
+
+
+# The BLS parameter x for BLS12-381 is -0xd201000000010000
+BLS_X = 0xD201_0000_0001_0000
+BLS_X_IS_NEGATIVE = True

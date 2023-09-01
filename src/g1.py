@@ -7,6 +7,8 @@ from src.utils import (
     wrapping_sub_u64,
     CtOption,
     Choice,
+    BLS_X,
+    BLS_X_IS_NEGATIVE,
 )
 
 
@@ -317,6 +319,25 @@ class G1Projective:
 
         return acc
 
+    def mul_by_x(self):
+        xself = G1Projective.identity()
+
+        # # NOTE: in BLS12-381 we can just skip the first bit.
+        # x = BLS_X >> 1
+        # tmp = self
+
+        # while x != 0:
+        #     tmp = tmp.double()
+        #     if x % 2 == 1:
+        #         xself += tmp
+        #     x >>= 1
+
+        # # finally, flip the sign
+        # if BLS_X_IS_NEGATIVE:
+        #     xself = -xself
+
+        return xself
+
 
 B = Fp(
     [
@@ -326,6 +347,18 @@ B = Fp(
         0xB1D3_7EBE_E6BA_24D7,
         0x8EC9_733B_BF78_AB2F,
         0x09D6_4551_3D83_DE7E,
+    ]
+)
+
+# A nontrivial third root of unity in Fp
+BETA = Fp(
+    [
+        0x30F1_361B_798A_64E8,
+        0xF3B8_DDAB_7ECE_5A2A,
+        0x16A8_CA3A_C615_77F7,
+        0xC26A_2FF8_74FD_029B,
+        0x3636_B766_6070_1C6E,
+        0x051B_A4AB_241B_6160,
     ]
 )
 
