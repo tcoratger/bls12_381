@@ -31,10 +31,12 @@ class G1Affine:
         return add_mixed(rhs, self)
 
     def __mul__(lhs, rhs):
-        if isinstance(rhs, Scalar):
+        if isinstance(rhs, Scalar) and isinstance(lhs, G1Affine):
             return G1Projective.from_g1_affine(lhs).multiply(rhs.to_bytes())
-        else:
+        elif isinstance(lhs, G1Affine):
             return G1Projective.from_g1_affine(lhs).multiply(rhs)
+        else:
+            raise ValueError("Unsupported type for multiplication")
 
     def identity():
         return G1Affine(Fp.zero(), Fp.one(), Choice(1))
