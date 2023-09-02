@@ -364,6 +364,44 @@ class G1Projective:
     def clear_cofactor(self):
         return self - self.mul_by_x()
 
+    def batch_normalize(p, q):
+        assert len(p) == len(q)
+
+        acc = Fp.one()
+        for p_item, q_item in zip(p, q):
+            # We use the `x` field of `G1Affine` to store the product
+            # of previous z-coordinates seen.
+            q_item.x = acc
+
+            # We will end up skipping all identities in p
+            acc = Fp.conditional_select(
+                acc * p_item.z, acc, Choice(1) if p_item.is_identity() else Choice(0)
+            )
+
+        # This is the inverse, as all z-coordinates are nonzero and the ones
+        # that are not are skipped.
+        acc = acc.invert().value
+
+        for p_item, q_item in zip(reversed(p), reversed(q)):
+            skip = p_item.is_identity()
+
+            # Compute tmp = 1/z
+            tmp = q_item.x * acc
+
+            # Cancel out z-coordinate in denominator of `acc`
+            acc = Fp.conditional_select(
+                acc * p_item.z, acc, Choice(1) if skip else Choice(0)
+            )
+
+            # Set the coordinates to the correct value
+            q_item.x = p_item.x * tmp
+            q_item.y = p_item.y * tmp
+            q_item.infinity = Choice(1) if skip else Choice(0)
+
+            q_item = G1Affine.conditional_select(
+                q_item, G1Affine.identity(), Choice(1) if skip else Choice(0)
+            )
+
 
 B = Fp(
     [

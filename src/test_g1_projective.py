@@ -590,3 +590,33 @@ class TestClearCoFactor(unittest.TestCase):
         # cleared multiplying by (1-x)
         h_eff = Scalar.from_u64(1) + Scalar.from_u64(BLS_X)
         self.assertTrue(point.clear_cofactor().eq(point * h_eff))
+
+
+class TestBatchNormalize(unittest.TestCase):
+    def test_batch_normalize(self):
+        a = G1Projective.generator().double()
+        b = a.double()
+        c = b.double()
+
+        for a_identity in [False, True]:
+            for b_identity in [False, True]:
+                for c_identity in [False, True]:
+                    v = [a, b, c]
+                    if a_identity:
+                        v[0] = G1Projective.identity()
+                    if b_identity:
+                        v[1] = G1Projective.identity()
+                    if c_identity:
+                        v[2] = G1Projective.identity()
+
+                    t = [G1Affine.identity(), G1Affine.identity(), G1Affine.identity()]
+                    expected = [
+                        G1Affine.from_g1_projective(v[0]),
+                        G1Affine.from_g1_projective(v[1]),
+                        G1Affine.from_g1_projective(v[2]),
+                    ]
+
+                    G1Projective.batch_normalize(v, t)
+
+                    for i in range(3):
+                        self.assertTrue(t[i].eq(expected[i]))
