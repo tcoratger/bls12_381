@@ -26,6 +26,9 @@ class G2Affine:
         self.y = y
         self.infinity = inf
 
+    def __add__(self, rhs):
+        return add_mixed(rhs, self)
+
     def identity():
         return G2Affine(Fp2.zero(), Fp2.one(), Choice(1))
 
@@ -133,6 +136,8 @@ class G2Projective:
     def __add__(self, rhs):
         if isinstance(rhs, G2Projective):
             return self.add(rhs)
+        elif isinstance(rhs, G2Affine):
+            return add_mixed(self, rhs)
         else:
             raise ValueError("Unsupported type for addition")
 
@@ -306,6 +311,48 @@ class G2Projective:
             y3,
             z3,
         )
+
+
+# Adds this point to another point in the affine model.
+def add_mixed(self: G2Projective, rhs: G2Affine):
+    # Algorithm 8, https://eprint.iacr.org/2015/1060.pdf
+
+    t0 = self.x * rhs.x
+    t1 = self.y * rhs.y
+    t3 = rhs.x + rhs.y
+    t4 = self.x + self.y
+    t3 = t3 * t4
+    t4 = t0 + t1
+    t3 = t3 - t4
+    t4 = rhs.y * self.z
+    t4 = t4 + self.y
+    y3 = rhs.x * self.z
+    y3 = y3 + self.x
+    x3 = t0 + t0
+    t0 = x3 + t0
+    t2 = mul_by_3b(self.z)
+    z3 = t1 + t2
+    t1 = t1 - t2
+    y3 = mul_by_3b(y3)
+    x3 = t4 * y3
+    t2 = t3 * t1
+    x3 = t2 - x3
+    y3 = y3 * t0
+    t1 = t1 * z3
+    y3 = t1 + y3
+    t0 = t0 * t3
+    z3 = z3 * t4
+    z3 = z3 + t0
+
+    tmp = G2Projective(
+        x3,
+        y3,
+        z3,
+    )
+
+    return G2Projective.conditional_select(
+        tmp, self, Choice(1) if rhs.is_identity() else Choice(0)
+    )
 
 
 def mul_by_3b(x: Fp2):
