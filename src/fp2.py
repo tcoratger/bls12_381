@@ -154,7 +154,7 @@ class Fp2:
                 Fp2(self.c0 * result.value, self.c1 * (-result.value)), True
             )
 
-        return CtOption(None, True)
+        return CtOption(None, False)
 
     def pow_vartime(self, by):
         res = Fp2.one()

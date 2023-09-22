@@ -49,7 +49,7 @@ class G2Affine:
 
     # Returns true if this element is the identity (the point at infinity).
     def is_identity(self):
-        return self.infinity
+        return self.infinity.value == 1
 
     # Returns true if this point is on the curve. This should always return
     # true unless an "unchecked" API was used.
@@ -107,6 +107,22 @@ class G2Affine:
             Choice(0),
         )
 
+    def from_g2_projective(p):
+        zinv = p.z.invert()
+        if zinv.choice:
+            zinv = zinv.value
+        else:
+            zinv = Fp2.zero()
+
+        x = p.x * zinv
+        y = p.y * zinv
+
+        tmp = G2Affine(x, y, Choice(0))
+
+        return G2Affine.conditional_select(
+            tmp, G2Affine.identity(), Choice(1) if zinv.is_zero() else Choice(0)
+        )
+
 
 class G2Projective:
     def __init__(self, x: Fp2, y: Fp2, z: Fp2):
@@ -114,9 +130,19 @@ class G2Projective:
         self.y = y
         self.z = z
 
+    def __add__(self, rhs):
+        if isinstance(rhs, G2Projective):
+            return self.add(rhs)
+        else:
+            raise ValueError("Unsupported type for addition")
+
     # Returns the identity of the group: the point at infinity.
     def identity():
         return G2Projective(Fp2.zero(), Fp2.one(), Fp2.zero())
+
+    # Returns true if this element is the identity (the point at infinity).
+    def is_identity(self):
+        return self.z.is_zero()
 
     # Returns a fixed generator of the group. See [`notes::design`](notes/design/index.html#fixed-generators)
     # for how this generator is chosen.
@@ -198,6 +224,92 @@ class G2Projective:
             Fp2.conditional_select(a.y, b.y, choice),
             Fp2.conditional_select(a.z, b.z, choice),
         )
+
+    def from_g2_affine(a):
+        return G2Projective(
+            a.x, a.y, Fp2.conditional_select(Fp2.one(), Fp2.zero(), a.infinity)
+        )
+
+    # Computes the doubling of this point.
+    def double(self):
+        # Algorithm 9, https://eprint.iacr.org/2015/1060.pdf
+
+        t0 = self.y.square()
+        z3 = t0 + t0
+        z3 = z3 + z3
+        z3 = z3 + z3
+        t1 = self.y * self.z
+        t2 = self.z.square()
+        t2 = mul_by_3b(t2)
+        x3 = t2 * z3
+        y3 = t0 + t2
+        z3 = t1 * z3
+        t1 = t2 + t2
+        t2 = t1 + t2
+        t0 = t0 - t2
+        y3 = t0 * y3
+        y3 = x3 + y3
+        t1 = self.x * self.y
+        x3 = t0 * t1
+        x3 = x3 + x3
+
+        tmp = G2Projective(
+            x3,
+            y3,
+            z3,
+        )
+
+        return G2Projective.conditional_select(
+            tmp, G2Projective.identity(), Choice(1) if self.is_identity() else Choice(0)
+        )
+
+    # Adds this point to another point.
+    def add(self, rhs):
+        # Algorithm 7, https://eprint.iacr.org/2015/1060.pdf
+
+        t0 = self.x * rhs.x
+        t1 = self.y * rhs.y
+        t2 = self.z * rhs.z
+        t3 = self.x + self.y
+        t4 = rhs.x + rhs.y
+        t3 = t3 * t4
+        t4 = t0 + t1
+        t3 = t3 - t4
+        t4 = self.y + self.z
+        x3 = rhs.y + rhs.z
+        t4 = t4 * x3
+        x3 = t1 + t2
+        t4 = t4 - x3
+        x3 = self.x + self.z
+        y3 = rhs.x + rhs.z
+        x3 = x3 * y3
+        y3 = t0 + t2
+        y3 = x3 - y3
+        x3 = t0 + t0
+        t0 = x3 + t0
+        t2 = mul_by_3b(t2)
+        z3 = t1 + t2
+        t1 = t1 - t2
+        y3 = mul_by_3b(y3)
+        x3 = t4 * y3
+        t2 = t3 * t1
+        x3 = t2 - x3
+        y3 = y3 * t0
+        t1 = t1 * z3
+        y3 = t1 + y3
+        t0 = t0 * t3
+        z3 = z3 * t4
+        z3 = z3 + t0
+
+        return G2Projective(
+            x3,
+            y3,
+            z3,
+        )
+
+
+def mul_by_3b(x: Fp2):
+    return x * B3
 
 
 B = Fp2(
