@@ -10,6 +10,9 @@ class Choice:
             raise ValueError("Choice must be either 0 or 1")
         self.value = value
 
+    def conditional_select(a, b, choice):
+        return Choice(choice.value * b.value + (1 - choice.value) * a.value)
+
 
 def sbb(a, b, borrow):
     """

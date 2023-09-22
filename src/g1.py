@@ -51,7 +51,7 @@ class G1Affine:
         return G1Affine(
             Fp.conditional_select(a.x, b.x, choice),
             Fp.conditional_select(a.y, b.y, choice),
-            b.infinity if choice.value else a.infinity,
+            Choice.conditional_select(a.infinity, b.infinity, choice),
         )
 
     # The only cases in which two points are equal are
