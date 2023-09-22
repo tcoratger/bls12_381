@@ -9,3 +9,5 @@ The core functionality and design of this Python implementation are based on the
 ## Disclaimer
 
 **Important**: This Python implementation has not been reviewed or audited for security. It is intended for educational and training purposes only. Please use it at your own risk and exercise caution when handling sensitive data or using it in any production environment.
+
+This repository only has an educational aim which is to understand the original BLS12-381 implementation in a language other than Rust but is absolutely not dedicated to production use.
