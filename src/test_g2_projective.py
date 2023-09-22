@@ -284,3 +284,82 @@ class TestAddition(unittest.TestCase):
         self.assertFalse(d.is_identity())
         self.assertTrue(d.is_on_curve())
         self.assertTrue(c.eq(d))
+
+        beta = Fp2(
+            Fp(
+                [
+                    0xCD03_C9E4_8671_F071,
+                    0x5DAB_2246_1FCD_A5D2,
+                    0x5870_42AF_D385_1B95,
+                    0x8EB6_0EBE_01BA_CB9E,
+                    0x03F9_7D6E_83D0_50D2,
+                    0x18F0_2065_5463_8741,
+                ]
+            ),
+            Fp.zero(),
+        )
+        beta = beta.square()
+        a = G2Projective.generator().double().double()  # 4P
+        b = G2Projective(
+            a.x * beta,
+            -a.y,
+            a.z,
+        )
+        self.assertTrue(a.is_on_curve())
+        self.assertTrue(b.is_on_curve())
+        c = a + b
+        self.assertTrue(
+            G2Affine.from_g2_projective(c).eq(
+                G2Affine.from_g2_projective(
+                    G2Projective(
+                        Fp2(
+                            Fp(
+                                [
+                                    0x705A_BC79_9CA7_73D3,
+                                    0xFE13_2292_C1D4_BF08,
+                                    0xF37E_CE3E_07B2_B466,
+                                    0x887E_1C43_F447_E301,
+                                    0x1E09_70D0_33BC_77E8,
+                                    0x1985_C81E_20A6_93F2,
+                                ]
+                            ),
+                            Fp(
+                                [
+                                    0x1D79_B25D_B36A_B924,
+                                    0x2394_8E4D_5296_39D3,
+                                    0x471B_A7FB_0D00_6297,
+                                    0x2C36_D4B4_465D_C4C0,
+                                    0x82BB_C3CF_EC67_F538,
+                                    0x051D_2728_B67B_F952,
+                                ]
+                            ),
+                        ),
+                        Fp2(
+                            Fp(
+                                [
+                                    0x41B1_BBF6_576C_0ABF,
+                                    0xB6CC_9371_3F7A_0F9A,
+                                    0x6B65_B43E_48F3_F01F,
+                                    0xFB7A_4CFC_AF81_BE4F,
+                                    0x3E32_DADC_6EC2_2CB6,
+                                    0x0BB0_FC49_D798_07E3,
+                                ]
+                            ),
+                            Fp(
+                                [
+                                    0x7D13_9778_8F5F_2DDF,
+                                    0xAB29_0714_4FF0_D8E8,
+                                    0x5B75_73E0_CDB9_1F92,
+                                    0x4CB8_932D_D31D_AF28,
+                                    0x62BB_FAC6_DB05_2A54,
+                                    0x11F9_5C16_D14C_3BBE,
+                                ]
+                            ),
+                        ),
+                        Fp2.one(),
+                    )
+                )
+            )
+        )
+        self.assertFalse(c.is_identity())
+        self.assertTrue(c.is_on_curve())
