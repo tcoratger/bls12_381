@@ -435,6 +435,32 @@ class G2Projective:
             self.z.frobenius_map(),
         )
 
+    def psi2(self):
+        # 1 / 2 ^ ((q-1)/3)
+        psi2_coeff_x = Fp2(
+            Fp(
+                (
+                    [
+                        0xCD03C9E48671F071,
+                        0x5DAB22461FCDA5D2,
+                        0x587042AFD3851B95,
+                        0x8EB60EBE01BACB9E,
+                        0x03F97D6E83D050D2,
+                        0x18F0206554638741,
+                    ]
+                )
+            ),
+            Fp.zero(),
+        )
+        return G2Projective(
+            # x = frobenius^2(x)/2^((p-1)/3); note that q^2 is the order of the field.
+            self.x * psi2_coeff_x,
+            # y = -frobenius^2(y); note that q^2 is the order of the field.
+            self.y.neg(),
+            # z = z
+            self.z,
+        )
+
     def mul_by_x(self):
         xself = G2Projective.identity()
 
@@ -453,6 +479,44 @@ class G2Projective:
             xself = -xself
 
         return xself
+
+    def batch_normalize(p, q):
+        assert len(p) == len(q)
+
+        acc = Fp2.one()
+        for p_item, q_item in zip(p, q):
+            # We use the `x` field of `G1Affine` to store the product
+            # of previous z-coordinates seen.
+            q_item.x = acc
+
+            # We will end up skipping all identities in p
+            acc = Fp2.conditional_select(
+                acc * p_item.z, acc, Choice(1) if p_item.is_identity() else Choice(0)
+            )
+
+        # This is the inverse, as all z-coordinates are nonzero and the ones
+        # that are not are skipped.
+        acc = acc.invert().value
+
+        for p_item, q_item in zip(reversed(p), reversed(q)):
+            skip = p_item.is_identity()
+
+            # Compute tmp = 1/z
+            tmp = q_item.x * acc
+
+            # Cancel out z-coordinate in denominator of `acc`
+            acc = Fp2.conditional_select(
+                acc * p_item.z, acc, Choice(1) if skip else Choice(0)
+            )
+
+            # Set the coordinates to the correct value
+            q_item.x = p_item.x * tmp
+            q_item.y = p_item.y * tmp
+            q_item.infinity = Choice(1) if skip else Choice(0)
+
+            q_item = G2Affine.conditional_select(
+                q_item, G2Affine.identity(), Choice(1) if skip else Choice(0)
+            )
 
 
 # Adds this point to another point in the affine model.
