@@ -144,6 +144,17 @@ class G2Affine:
             self.infinity,
         )
 
+    # Returns true if this point is free of an $h$-torsion component, and so it
+    # exists within the $q$-order subgroup $\mathbb{G}_2$. This should always return true
+    # unless an "unchecked" API was used.
+    def is_torsion_free(self):
+        # Algorithm from Section 4 of https://eprint.iacr.org/2021/1130
+        # Updated proof of correctness in https://eprint.iacr.org/2022/352
+
+        # Check that psi(P) == [x] P
+        p = G2Projective.from_g2_affine(self)
+        return p.psi().eq(p.mul_by_x())
+
 
 class G2Projective:
     def __init__(self, x: Fp2, y: Fp2, z: Fp2):
@@ -374,6 +385,74 @@ class G2Projective:
                 )
 
         return acc
+
+    def psi(self):
+        # 1 / ((u+1) ^ ((q-1)/3))
+        psi_coeff_x = Fp2(
+            Fp.zero(),
+            Fp(
+                (
+                    [
+                        0x890DC9E4867545C3,
+                        0x2AF322533285A5D5,
+                        0x50880866309B7E2C,
+                        0xA20D1B8C7E881024,
+                        0x14E4F04FE2DB9068,
+                        0x14E56D3F1564853A,
+                    ]
+                )
+            ),
+        )
+        # 1 / ((u+1) ^ (p-1)/2)
+        psi_coeff_y = Fp2(
+            Fp(
+                [
+                    0x3E2F585DA55C9AD1,
+                    0x4294213D86C18183,
+                    0x382844C88B623732,
+                    0x92AD2AFD19103E18,
+                    0x1D794E4FAC7CF0B9,
+                    0x0BD592FC7D825EC8,
+                ]
+            ),
+            Fp(
+                [
+                    0x7BCFA7A25AA30FDA,
+                    0xDC17DEC12A927E7C,
+                    0x2F088DD86B4EBEF1,
+                    0xD1CA2087DA74D4A7,
+                    0x2DA2596696CEBC1D,
+                    0x0E2B7EEDBBFD87D2,
+                ]
+            ),
+        )
+        return G2Projective(
+            # x = frobenius(x)/((u+1)^((p-1)/3))
+            self.x.frobenius_map() * psi_coeff_x,
+            # y = frobenius(y)/(u+1)^((p-1)/2)
+            self.y.frobenius_map() * psi_coeff_y,
+            # z = frobenius(z)
+            self.z.frobenius_map(),
+        )
+
+    def mul_by_x(self):
+        xself = G2Projective.identity()
+
+        # # NOTE: in BLS12-381 we can just skip the first bit.
+        x = BLS_X >> 1
+        tmp = self
+
+        while x != 0:
+            tmp = tmp.double()
+            if x % 2 == 1:
+                xself += tmp
+            x >>= 1
+
+        # finally, flip the sign
+        if BLS_X_IS_NEGATIVE:
+            xself = -xself
+
+        return xself
 
 
 # Adds this point to another point in the affine model.

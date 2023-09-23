@@ -135,3 +135,57 @@ class TestScalarMultiplication(unittest.TestCase):
         )
         c = a * b
         self.assertTrue((G2Affine.from_g2_projective(g * a) * b).eq(g * c))
+
+
+class TestTorsionFree(unittest.TestCase):
+    def test_is_torsion_free(self):
+        a = G2Affine(
+            Fp2(
+                Fp(
+                    [
+                        0x89F5_50C8_13DB_6431,
+                        0xA50B_E8C4_56CD_8A1A,
+                        0xA45B_3741_14CA_E851,
+                        0xBB61_90F5_BF7F_FF63,
+                        0x970C_A02C_3BA8_0BC7,
+                        0x02B8_5D24_E840_FBAC,
+                    ]
+                ),
+                Fp(
+                    [
+                        0x6888_BC53_D707_16DC,
+                        0x3DEA_6B41_1768_2D70,
+                        0xD8F5_F930_500C_A354,
+                        0x6B5E_CB65_56F5_C155,
+                        0xC96B_EF04_3477_8AB0,
+                        0x0508_1505_5150_06AD,
+                    ]
+                ),
+            ),
+            Fp2(
+                Fp(
+                    [
+                        0x3CF1_EA0D_434B_0F40,
+                        0x1A0D_C610_E603_E333,
+                        0x7F89_9561_60C7_2FA0,
+                        0x25EE_03DE_CF64_31C5,
+                        0xEEE8_E206_EC0F_E137,
+                        0x0975_92B2_26DF_EF28,
+                    ]
+                ),
+                Fp(
+                    [
+                        0x71E8_BB5F_2924_7367,
+                        0xA5FE_049E_2118_31CE,
+                        0x0CE6_B354_502A_3896,
+                        0x93B0_1200_0997_314E,
+                        0x6759_F3B6_AA5B_42AC,
+                        0x1569_44C4_DFE9_2BBB,
+                    ]
+                ),
+            ),
+            Choice(0),
+        )
+        self.assertFalse(a.is_torsion_free())
+        self.assertTrue(G2Affine.identity().is_torsion_free())
+        self.assertTrue(G2Affine.generator().is_torsion_free())
