@@ -29,6 +29,9 @@ class G2Affine:
     def __add__(self, rhs):
         return add_mixed(rhs, self)
 
+    def __neg__(self):
+        return self.neg()
+
     def identity():
         return G2Affine(Fp2.zero(), Fp2.one(), Choice(1))
 
@@ -126,6 +129,13 @@ class G2Affine:
             tmp, G2Affine.identity(), Choice(1) if zinv.is_zero() else Choice(0)
         )
 
+    def neg(self):
+        return G2Affine(
+            self.x,
+            Fp2.conditional_select(-self.y, Fp2.one(), self.infinity),
+            self.infinity,
+        )
+
 
 class G2Projective:
     def __init__(self, x: Fp2, y: Fp2, z: Fp2):
@@ -140,6 +150,12 @@ class G2Projective:
             return add_mixed(self, rhs)
         else:
             raise ValueError("Unsupported type for addition")
+
+    def __neg__(self):
+        return self.neg()
+
+    def __sub__(self, other):
+        return self.sub(other)
 
     # Returns the identity of the group: the point at infinity.
     def identity():
@@ -311,6 +327,12 @@ class G2Projective:
             y3,
             z3,
         )
+
+    def neg(self):
+        return G2Projective(self.x, -self.y, self.z)
+
+    def sub(self, rhs):
+        return self + (-rhs)
 
 
 # Adds this point to another point in the affine model.

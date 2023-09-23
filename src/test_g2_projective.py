@@ -530,3 +530,10 @@ class TestAddition(unittest.TestCase):
         )
         self.assertFalse(c.is_identity())
         self.assertTrue(c.is_on_curve())
+
+
+class TestSubNeg(unittest.TestCase):
+    def test_projective_negation_and_subtraction(self):
+        a = G2Projective.generator().double()
+        self.assertTrue((a + (-a)).eq(G2Projective.identity()))
+        self.assertTrue((a + (-a)).eq(a - a))

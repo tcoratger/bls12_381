@@ -98,3 +98,17 @@ class TestProjectiveToAffine(unittest.TestCase):
 
         c = G2Projective(a.x * z, a.y * z, z)
         self.assertTrue(G2Affine.from_g2_projective(c).eq(G2Affine.generator()))
+
+
+class TestSubNeg(unittest.TestCase):
+    def test_affine_negation_and_subtraction(self):
+        a = G2Affine.generator()
+
+        self.assertTrue(
+            (G2Projective.from_g2_affine(a) + (-a)).eq(G2Projective.identity())
+        )
+        self.assertTrue(
+            (G2Projective.from_g2_affine(a) + (-a)).eq(
+                G2Projective.from_g2_affine(a) - a
+            )
+        )
