@@ -14,7 +14,7 @@ from src.fp12 import (
 from src.g1 import G1Affine, G1Projective, BETA
 from src.g2 import G2Affine, G2Projective
 import random
-from src.utils import array_to_number, Choice
+from src.utils import array_to_number, Choice, BLS_X, BLS_X_IS_NEGATIVE
 from src.scalar import Scalar
 
 
@@ -560,3 +560,16 @@ class TestScalarMultiplication(unittest.TestCase):
         )
         c = a * b
         self.assertTrue(((g * a) * b).eq(g * c))
+
+
+class TestMultiplyByX(unittest.TestCase):
+    def test_mul_by_x(self):
+        # multiplying by `x` a point in G1 is the same as multiplying by
+        # the equivalent scalar.
+        generator = G2Projective.generator()
+        x = -Scalar.from_u64(BLS_X) if (BLS_X_IS_NEGATIVE) else Scalar.from_u64(BLS_X)
+
+        self.assertTrue(generator.mul_by_x().eq(generator * x))
+
+        point = G2Projective.generator() * Scalar.from_u64(42)
+        self.assertTrue(point.mul_by_x().eq(point * x))
