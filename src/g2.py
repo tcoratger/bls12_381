@@ -32,6 +32,14 @@ class G2Affine:
     def __neg__(self):
         return self.neg()
 
+    def __mul__(lhs, rhs):
+        if isinstance(rhs, Scalar) and isinstance(lhs, G2Affine):
+            return G2Projective.from_g2_affine(lhs).multiply(rhs.to_bytes())
+        elif isinstance(lhs, G2Affine):
+            return G2Projective.from_g2_affine(lhs).multiply(rhs)
+        else:
+            raise ValueError("Unsupported type for multiplication")
+
     def identity():
         return G2Affine(Fp2.zero(), Fp2.one(), Choice(1))
 
@@ -156,6 +164,14 @@ class G2Projective:
 
     def __sub__(self, other):
         return self.sub(other)
+
+    def __mul__(lhs, rhs):
+        if isinstance(rhs, Scalar):
+            return lhs.multiply(rhs.to_bytes())
+        elif isinstance(lhs, Scalar):
+            return rhs.multiply(lhs.to_bytes())
+        else:
+            return lhs.multiply(rhs)
 
     # Returns the identity of the group: the point at infinity.
     def identity():
@@ -333,6 +349,31 @@ class G2Projective:
 
     def sub(self, rhs):
         return self + (-rhs)
+
+    def multiply(self, by):
+        acc = G2Projective.identity()
+
+        # This is a simple double-and-add implementation of point
+        # multiplication, moving from most significant to least
+        # significant bit of the scalar.
+
+        # We skip the leading bit because it's always unset for Fq
+        # elements.
+
+        first_bit = True
+
+        for byte in reversed(by):
+            for i in range(7, -1, -1):
+                if first_bit:
+                    first_bit = False
+                    continue
+                bit = (byte >> i) & 1
+                acc = acc.double()
+                acc = G2Projective.conditional_select(
+                    acc, acc + self, Choice(1) if bit else Choice(0)
+                )
+
+        return acc
 
 
 # Adds this point to another point in the affine model.

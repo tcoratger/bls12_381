@@ -537,3 +537,26 @@ class TestSubNeg(unittest.TestCase):
         a = G2Projective.generator().double()
         self.assertTrue((a + (-a)).eq(G2Projective.identity()))
         self.assertTrue((a + (-a)).eq(a - a))
+
+
+class TestScalarMultiplication(unittest.TestCase):
+    def test_projective_scalar_multiplication(self):
+        g = G2Projective.generator()
+        a = Scalar(
+            [
+                0x2B56_8297_A56D_A71C,
+                0xD8C3_9ECB_0EF3_75D1,
+                0x435C_38DA_67BF_BF96,
+                0x8088_A050_26B6_59B2,
+            ]
+        )
+        b = Scalar(
+            [
+                0x785F_DD9B_26EF_8B85,
+                0xC997_F258_3769_5C18,
+                0x4C8D_BC39_E7B7_56C1,
+                0x70D9_B6CC_6D87_DF20,
+            ]
+        )
+        c = a * b
+        self.assertTrue(((g * a) * b).eq(g * c))
