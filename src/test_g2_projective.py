@@ -662,3 +662,131 @@ class TestPsi(unittest.TestCase):
         normalized_point = G2Projective.from_g2_affine(normalized_point[0])
         self.assertTrue(point.psi().eq(normalized_point.psi()))
         self.assertTrue(point.psi2().eq(normalized_point.psi2()))
+
+
+class TestClearCofactor(unittest.TestCase):
+    def test_clear_cofactor(self):
+        z = Fp2(
+            Fp(
+                [
+                    0x0EF2DDFFAB187C0A,
+                    0x2424522B7D5ECBFC,
+                    0xC6F341A3398054F4,
+                    0x5523DDF409502DF0,
+                    0xD55C0B5A88E0DD97,
+                    0x066428D704923E52,
+                ]
+            ),
+            Fp(
+                [
+                    0x538BBE0C95B4878D,
+                    0xAD04A50379522881,
+                    0x6D5C05BF5C12FB64,
+                    0x4CE4A069A2D34787,
+                    0x59EA6C8D0DFFAEAF,
+                    0x0D42A083A75BD6F3,
+                ]
+            ),
+        )
+        # `point` is a random point in the curve
+        point = G2Projective(
+            Fp2(
+                Fp(
+                    [
+                        0xEE4C8CB7C047EAF2,
+                        0x44CA22EEE036B604,
+                        0x33B3AFFB2AEFE101,
+                        0x15D3E45BBAFAEB02,
+                        0x7BFC2154CD7419A4,
+                        0x0A2D0C2B756E5EDC,
+                    ]
+                ),
+                Fp(
+                    [
+                        0xFC224361029A8777,
+                        0x4CBF2BAAB8740924,
+                        0xC5008C6EC6592C89,
+                        0xECC2C57B472A9C2D,
+                        0x8613EAFD9D81FFB1,
+                        0x10FE54DAA2D3D495,
+                    ]
+                ),
+            )
+            * z,
+            Fp2(
+                Fp(
+                    [
+                        0x7DE7EDC43953B75C,
+                        0x58BE1D2DE35E87DC,
+                        0x5731D30B0E337B40,
+                        0xBE93B60CFEAAE4C9,
+                        0x8B22C203764BEDCA,
+                        0x01616C8D1033B771,
+                    ]
+                ),
+                Fp(
+                    [
+                        0xEA126FE476B5733B,
+                        0x85CEE68B5DAE1652,
+                        0x98247779F7272B04,
+                        0xA649C8B468C6E808,
+                        0xB5B9A62DFF0C4E45,
+                        0x1555B67FC7BBE73D,
+                    ]
+                ),
+            ),
+            z.square() * z,
+        )
+        self.assertTrue(point.is_on_curve())
+        self.assertFalse(G2Affine.from_g2_projective(point).is_torsion_free())
+        cleared_point = point.clear_cofactor()
+        self.assertTrue(cleared_point.is_on_curve())
+        self.assertTrue(G2Affine.from_g2_projective(cleared_point).is_torsion_free())
+
+        # the generator (and the identity) are always on the curve,
+        # even after clearing the cofactor
+        generator = G2Projective.generator()
+        self.assertTrue(generator.clear_cofactor().is_on_curve())
+        id = G2Projective.identity()
+        self.assertTrue(id.clear_cofactor().is_on_curve())
+
+        # test the effect on q-torsion points multiplying by h_eff modulo |Scalar|
+        # h_eff % q = 0x2b116900400069009a40200040001ffff
+        h_eff_modq = [
+            0xFF,
+            0xFF,
+            0x01,
+            0x00,
+            0x04,
+            0x00,
+            0x02,
+            0xA4,
+            0x09,
+            0x90,
+            0x06,
+            0x00,
+            0x04,
+            0x90,
+            0x16,
+            0xB1,
+            0x02,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+        ]
+        self.assertTrue(generator.clear_cofactor().eq(generator.multiply(h_eff_modq)))
+        self.assertTrue(
+            cleared_point.clear_cofactor().eq(cleared_point.multiply(h_eff_modq))
+        )

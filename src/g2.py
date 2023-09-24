@@ -518,6 +518,17 @@ class G2Projective:
                 q_item, G2Affine.identity(), Choice(1) if skip else Choice(0)
             )
 
+    # Clears the cofactor, using [Budroni-Pintore](https://ia.cr/2017/419).
+    # This is equivalent to multiplying by $h\_\textrm{eff} = 3(z^2 - 1) \cdot
+    # h_2$, where $h_2$ is the cofactor of $\mathbb{G}\_2$ and $z$ is the
+    # parameter of BLS12-381.
+    def clear_cofactor(self):
+        t1 = self.mul_by_x()  # [x] P
+        t2 = self.psi()  # psi(P)
+
+        # psi^2(2P) + [x^2 - x - 1] P + [x - 1] psi(P)
+        return self.double().psi2() + (t1 + t2).mul_by_x() - t1 - t2 - self
+
 
 # Adds this point to another point in the affine model.
 def add_mixed(self: G2Projective, rhs: G2Affine):
