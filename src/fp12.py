@@ -73,7 +73,7 @@ class Fp12:
         c0 = c0.mul_by_nonresidue()
         c0 = c0 + aa
 
-        Fp12(c0, c1)
+        return Fp12(c0, c1)
 
     def conjugate(self):
         return Fp12(self.c0, -self.c1)

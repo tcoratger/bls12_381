@@ -176,13 +176,15 @@ class G2Projective:
     def __sub__(self, other):
         return self.sub(other)
 
-    def __mul__(lhs, rhs):
+    def __mul__(self, rhs):
         if isinstance(rhs, Scalar):
-            return lhs.multiply(rhs.to_bytes())
-        elif isinstance(lhs, Scalar):
-            return rhs.multiply(lhs.to_bytes())
+            return self.multiply(rhs.to_bytes())
+        elif isinstance(self, Scalar):
+            return rhs.multiply(self.to_bytes())
+        elif isinstance(rhs, G2Projective):
+            return self.multiply(rhs)
         else:
-            return lhs.multiply(rhs)
+            return NotImplemented
 
     # Returns the identity of the group: the point at infinity.
     def identity():

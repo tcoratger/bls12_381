@@ -28,7 +28,10 @@ class Scalar:
         return self.sub(other)
 
     def __mul__(self, other):
-        return self.mul(other)
+        if isinstance(other, Scalar) and isinstance(self, Scalar):
+            return self.mul(other)
+        else:
+            return NotImplemented
 
     def __neg__(self):
         return self.neg()

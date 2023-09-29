@@ -16,10 +16,7 @@ class Fp:
         self.array = array
 
     def __str__(self):
-        hex_array = [hex(num)[2:] for num in self.array[::-1]]
-        concatenated_hex = "".join(hex_array)
-        result = f"0x{concatenated_hex}\n"
-        return result
+        return "0x" + self.to_bytes().hex()
 
     def __mul__(self, other):
         return self.mul(other)
