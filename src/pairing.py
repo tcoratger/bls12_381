@@ -190,6 +190,29 @@ class Gt:
         result = f"Gt({self.fp})\n"
         return result
 
+    def __mul__(lhs, rhs):
+        if isinstance(rhs, Scalar):
+            return lhs.mul(rhs)
+        else:
+            raise ValueError("Unsupported type for multiplication")
+
+    def mul(self, other: Scalar):
+        acc = Gt.identity()
+
+        # This is a simple double-and-add implementation of group element
+        # multiplication, moving from most significant to least
+        # significant bit of the scalar.
+        #
+        # We skip the leading bit because it's always unset for Fq
+        # elements.
+        for byte in reversed(other.to_bytes()):
+            for i in range(7, -1, -1):
+                bit = Choice(1) if (byte >> i) & 1 else Choice(0)
+                acc = acc.double()
+                acc = Gt.conditional_select(acc, acc + self, bit)
+
+        return acc
+
     # Returns the group identity, which is $1$.
     @staticmethod
     def identity():

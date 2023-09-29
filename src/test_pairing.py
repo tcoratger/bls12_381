@@ -35,9 +35,22 @@ class TestGt(unittest.TestCase):
         self.assertTrue(Gt.default().fp.eq(Fp12.one()))
         self.assertTrue(Gt.default().eq(Gt.identity()))
 
-
-class TestGtGenerator(unittest.TestCase):
     def test_gt_generator(self):
         self.assertTrue(
             Gt.generator().eq(pairing(G1Affine.generator(), G2Affine.generator()))
         )
+
+    def test_bilinearity(self):
+        a = Scalar.from_raw([1, 2, 3, 4]).invert().value.square()
+        b = Scalar.from_raw([5, 6, 7, 8]).invert().value.square()
+        c = a * b
+
+        g = G1Affine.from_g1_projective(G1Affine.generator() * a)
+        h = G2Affine.from_g2_projective(G2Affine.generator() * b)
+        p = pairing(g, h)
+
+        self.assertFalse(p.eq(Gt.identity()))
+
+        expected = G1Affine.from_g1_projective(G1Affine.generator() * c)
+        self.assertTrue(p.eq(pairing(expected, G2Affine.generator())))
+        self.assertTrue(p.eq(pairing(G1Affine.generator(), G2Affine.generator()) * c))
