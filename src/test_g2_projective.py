@@ -790,3 +790,33 @@ class TestClearCofactor(unittest.TestCase):
         self.assertTrue(
             cleared_point.clear_cofactor().eq(cleared_point.multiply(h_eff_modq))
         )
+
+
+class TestBatchNormalize(unittest.TestCase):
+    def test_batch_normalize(self):
+        a = G2Projective.generator().double()
+        b = a.double()
+        c = b.double()
+
+        for a_identity in [False, True]:
+            for b_identity in [False, True]:
+                for c_identity in [False, True]:
+                    v = [a, b, c]
+                    if a_identity:
+                        v[0] = G2Projective.identity()
+                    if b_identity:
+                        v[1] = G2Projective.identity()
+                    if c_identity:
+                        v[2] = G2Projective.identity()
+
+                    t = [G2Affine.identity(), G2Affine.identity(), G2Affine.identity()]
+                    expected = [
+                        G2Affine.from_g2_projective(v[0]),
+                        G2Affine.from_g2_projective(v[1]),
+                        G2Affine.from_g2_projective(v[2]),
+                    ]
+
+                    G2Projective.batch_normalize(v, t)
+
+                    for i in range(3):
+                        self.assertTrue(t[i].eq(expected[i]))
