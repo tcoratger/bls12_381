@@ -18,6 +18,29 @@ from src.fp12 import (
 )
 from src.g1 import G1Affine
 from src.g2 import G2Affine, G2Projective
+from abc import ABC, abstractmethod
+
+
+class MillerLoopDriver(ABC):
+    @abstractmethod
+    def doubling_step(self, f):
+        pass
+
+    @abstractmethod
+    def addition_step(self, f):
+        pass
+
+    @abstractmethod
+    def square_output(self, f):
+        pass
+
+    @abstractmethod
+    def conjugate(self, f):
+        pass
+
+    @abstractmethod
+    def one(self):
+        pass
 
 
 # Represents results of a Miller loop, one of the most expensive portions
@@ -389,6 +412,30 @@ class Gt:
         )
 
 
+class AdderG2Prepared(MillerLoopDriver):
+    def __init__(self, cur: G2Projective, base: G2Affine, coeffs: [(Fp2, Fp2, Fp2)]):
+        self.cur = cur
+        self.base = base
+        self.coeffs = coeffs
+
+    def doubling_step(self, _):
+        coeffs = doubling_step(self.cur)
+        self.coeffs.append(coeffs)
+
+    def addition_step(self, _):
+        coeffs = addition_step(self.cur, self.base)
+        self.coeffs.append(coeffs)
+
+    def square_output(self, _):
+        pass
+
+    def conjugate(self, _):
+        pass
+
+    def one(self):
+        return ()
+
+
 class G2Prepared:
     def __init__(self, infinity: Choice, coeffs: [Fp2, Fp2, Fp2]):
         self.infinity = infinity
@@ -396,8 +443,16 @@ class G2Prepared:
 
     def from_g2_affine(q: G2Affine):
         is_identity = q.is_identity()
-        q = G2Affine.conditional_select(q, G2Affine.generator(), is_identity)
-        adder = Adder(G2Projective.from_g2_affineq, q, [])
+        q = G2Affine.conditional_select(
+            q, G2Affine.generator(), Choice(1) if is_identity else Choice(0)
+        )
+        adder = AdderG2Prepared(G2Projective.from_g2_affine(q), q, [])
+
+        miller_loop(adder)
+
+        assert len(adder.coeffs) == 68
+
+        return G2Prepared(is_identity, adder.coeffs)
 
 
 def ell(f: Fp12, coeffs: (Fp2, Fp2, Fp2), p: G1Affine):
@@ -476,7 +531,7 @@ def addition_step(r: G2Projective, q: G2Affine):
     return (t10, t1, t9)
 
 
-class Adder:
+class Adder(MillerLoopDriver):
     def __init__(self, cur: G2Projective, base: G2Affine, p: G1Affine):
         self.cur = cur
         self.base = base
@@ -484,28 +539,68 @@ class Adder:
 
     def doubling_step(self, f: Fp12):
         coeffs = doubling_step(self.cur)
-        # coeffs = (Fp2.one(), Fp2.one(), Fp2.one())
         return ell(f, coeffs, self.p)
 
     def addition_step(self, f: Fp12):
         coeffs = addition_step(self.cur, self.base)
         return ell(f, coeffs, self.p)
 
-    def square_output(f: Fp12):
+    def square_output(self, f: Fp12):
         return f.square()
 
-    def conjugate(f: Fp12):
+    def conjugate(self, f: Fp12):
         return f.conjugate()
 
-    def one():
+    def one(self):
+        return Fp12.one()
+
+
+class AdderMulti(MillerLoopDriver):
+    def __init__(self, terms: [(G1Affine, G2Prepared)], index):
+        self.terms = terms
+        self.index = index
+
+    def doubling_step(self, f):
+        index = self.index
+        for term in self.terms:
+            either_identity = term[0].is_identity() or term[1].infinity
+
+            new_f = ell(f, term[1].coeffs[index], term[0])
+            f = Fp12.conditional_select(
+                new_f, f, Choice(1) if either_identity else Choice(0)
+            )
+
+        self.index += 1
+        return f
+
+    def addition_step(self, f):
+        index = self.index
+        for term in self.terms:
+            either_identity = term[0].is_identity() or term[1].infinity
+
+            new_f = ell(f, term[1].coeffs[index], term[0])
+            f = Fp12.conditional_select(
+                new_f, f, Choice(1) if either_identity else Choice(0)
+            )
+
+        self.index += 1
+        return f
+
+    def square_output(self, f):
+        return f.square()
+
+    def conjugate(self, f):
+        return f.conjugate()
+
+    def one(self):
         return Fp12.one()
 
 
 # This is a "generic" implementation of the Miller loop to avoid duplicating code
 # structure elsewhere instead, we'll write concrete instantiations of
 # `MillerLoopDriver` for whatever purposes we need (such as caching modes).
-def miller_loop(driver: Adder):
-    f = Adder.one()
+def miller_loop(driver: MillerLoopDriver):
+    f = driver.one()
 
     found_one = False
 
@@ -521,24 +616,43 @@ def miller_loop(driver: Adder):
         if b:
             f = driver.addition_step(f)
 
-        f = Adder.square_output(f)
+        f = driver.square_output(f)
 
     f = driver.doubling_step(f)
 
     if BLS_X_IS_NEGATIVE:
-        f = f.conjugate()
+        f = driver.conjugate(f)
 
     return f
 
 
+# Computes $$\sum_{i=1}^n \textbf{ML}(a_i, b_i)$$ given a series of terms
+# $$(a_1, b_1), (a_2, b_2), ..., (a_n, b_n).$$
+#
+# Requires the `alloc` and `pairing` crate features to be enabled.
+def multi_miller_loop(terms: [(G1Affine, G2Prepared)]):
+    adder = AdderMulti(terms, 0)
+    tmp = miller_loop(adder)
+
+    return MillerLoopResult(tmp)
+
+
 def pairing(p: G1Affine, q: G2Affine):
-    either_identity = p.is_identity() or q.is_identity()
-    p = G1Affine.conditional_select(p, G1Affine.generator(), either_identity)
-    q = G2Affine.conditional_select(q, G2Affine.generator(), either_identity)
+    either_identity = p.is_identity().value == 1 or q.is_identity()
+    p = G1Affine.conditional_select(
+        p, G1Affine.generator(), Choice(1) if either_identity else Choice(0)
+    )
+    q = G2Affine.conditional_select(
+        q, G2Affine.generator(), Choice(1) if either_identity else Choice(0)
+    )
 
     adder = Adder(G2Projective.from_g2_affine(q), q, p)
 
     tmp = miller_loop(adder)
-    tmp = MillerLoopResult(Fp12.conditional_select(tmp, Fp12.one(), either_identity))
+    tmp = MillerLoopResult(
+        Fp12.conditional_select(
+            tmp, Fp12.one(), Choice(1) if either_identity else Choice(0)
+        )
+    )
 
     return tmp.final_exponentiation()
