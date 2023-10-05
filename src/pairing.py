@@ -452,7 +452,7 @@ class G2Prepared:
 
         assert len(adder.coeffs) == 68
 
-        return G2Prepared(is_identity, adder.coeffs)
+        return G2Prepared(Choice(1) if is_identity else Choice(0), adder.coeffs)
 
 
 def ell(f: Fp12, coeffs: (Fp2, Fp2, Fp2), p: G1Affine):
@@ -563,7 +563,9 @@ class AdderMulti(MillerLoopDriver):
     def doubling_step(self, f):
         index = self.index
         for term in self.terms:
-            either_identity = term[0].is_identity() or term[1].infinity
+            either_identity = (
+                term[0].is_identity().value == 1 or term[1].infinity.value == 1
+            )
 
             new_f = ell(f, term[1].coeffs[index], term[0])
             f = Fp12.conditional_select(
@@ -576,7 +578,9 @@ class AdderMulti(MillerLoopDriver):
     def addition_step(self, f):
         index = self.index
         for term in self.terms:
-            either_identity = term[0].is_identity() or term[1].infinity
+            either_identity = (
+                term[0].is_identity().value == 1 or term[1].infinity.value == 1
+            )
 
             new_f = ell(f, term[1].coeffs[index], term[0])
             f = Fp12.conditional_select(
