@@ -132,3 +132,31 @@ class TestMultiMillerLoop(unittest.TestCase):
         ).final_exponentiation()
 
         self.assertTrue(expected.eq(test))
+
+    def tricking_miller_loop_result(self):
+        self.assertTrue(
+            multi_miller_loop(
+                [G1Affine.identity(), G2Prepared.from_g2_affine(G2Affine.generator())]
+            ).fp.eq(Fp12.one())
+        )
+        self.assertTrue(
+            multi_miller_loop(
+                [G1Affine.generator(), G2Prepared.from_g2_affine(G2Affine.identity())]
+            ).fp.eq(Fp12.one())
+        )
+        self.assertFalse(
+            multi_miller_loop(
+                [
+                    (
+                        G1Affine.generator(),
+                        G2Prepared.from_g2_affine(G2Affine.generator()),
+                    ),
+                    (
+                        -G1Affine.generator(),
+                        G2Prepared.from_g2_affine(G2Affine.generator()),
+                    ),
+                ]
+            )
+            .final_exponentiation()
+            .eq(Gt.identity())
+        )
