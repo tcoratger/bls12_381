@@ -660,3 +660,11 @@ def pairing(p: G1Affine, q: G2Affine):
     )
 
     return tmp.final_exponentiation()
+
+
+def pairing_with_G1Affine(g: G1Affine, other: G2Affine):
+    return pairing(g, other)
+
+
+def pairing_with_G2Affine(g: G2Affine, other: G1Affine):
+    return pairing(other, g)
