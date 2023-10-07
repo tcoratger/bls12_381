@@ -16,9 +16,10 @@ from src.scalar import Scalar
 from src.fp12 import (
     Fp12,
 )
-from src.g1 import G1Affine
+from src.g1 import G1Affine, G1Projective
 from src.g2 import G2Affine, G2Projective
 from abc import ABC, abstractmethod
+from src.chain import chain_pm3div4
 
 
 # Implementation of hash-to-curve for the G1 group.
@@ -646,6 +647,28 @@ P_M1_OVER2 = Fp(
 )
 
 
+def from_okm_fp(okm):
+    F_2_256 = Fp(
+        [
+            0x075B_3CD7_C5CE_820F,
+            0x3EC6_BA62_1C3E_DB0B,
+            0x168A_13D8_2BFF_6BCE,
+            0x8766_3C4B_F8C4_49D2,
+            0x15F3_4C83_DDC8_D830,
+            0x0F96_28B4_9CAA_2E85,
+        ]
+    )
+
+    bs = bytearray(48)
+    bs[16:] = okm[:32]
+    db = Fp.from_bytes(bs).value
+
+    bs[16:] = okm[32:]
+    da = Fp.from_bytes(bs).value
+
+    return db * F_2_256 + da
+
+
 def sng0(fp: Fp):
     # Turn into canonical form by computing
     # (a.R) / R = a
@@ -665,3 +688,54 @@ def sng0(fp: Fp):
     )
 
     return Choice(1) if (tmp.array[0] & 1) else Choice(0)
+
+
+# Maps an element of [`Fp`] to a point on iso-G1.
+#
+# Implements [section 6.6.2 of `draft-irtf-cfrg-hash-to-curve-12`][sswu].
+#
+# [sswu]: https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-12#section-6.6.2
+def map_to_curve_simple_swu(u: Fp):
+    usq = u * u
+    xi_usq = SSWU_XI * usq
+    xisq_u4 = xi_usq.square()
+    nd_common = xisq_u4 + xi_usq  # XI^2 * u^4 + XI * u^2
+
+    x_den = SSWU_ELLP_A * Fp.conditional_select(
+        -nd_common, SSWU_XI, Choice(1) if nd_common.is_zero() else Choice(0)
+    )
+    x0_num = SSWU_ELLP_B * (Fp.one() + nd_common)  # B * (1 + (XI^2 * u^4 + XI * u^2))
+
+    # compute g(x0(u))
+    x_densq = x_den.square()
+    gx_den = x_densq * x_den
+    # x0_num^3 + A * x0_num * x_den^2 + B * x_den^3
+    gx0_num = (x0_num.square() + SSWU_ELLP_A * x_densq) * x0_num + SSWU_ELLP_B * gx_den
+
+    u_v = gx0_num * gx_den  # u*v
+    vsq = gx_den.square()  # v^2
+    sqrt_candidate = u_v * chain_pm3div4(u_v * vsq)  # u v (u v^3) ^ ((p - 3) // 4)
+
+    gx0_square = (sqrt_candidate.square() * gx_den).eq(gx0_num)  # g(x0) is square
+    x1_num = x0_num * xi_usq
+    # sqrt(-XI**3) * u^3 g(x0) ^ ((p - 3) // 4)
+    y1 = SQRT_M_XI_CUBED * usq * u * sqrt_candidate
+
+    x_num = Fp.conditional_select(
+        x1_num, x0_num, Choice(1) if gx0_square else Choice(0)
+    )
+    y = Fp.conditional_select(
+        y1, sqrt_candidate, Choice(1) if gx0_square else Choice(0)
+    )
+    y = -y if (sng0(y).value ^ sng0(u).value) == 1 else y
+
+    return G1Projective(x_num, y * x_den, x_den)
+
+
+def check_g1_prime(pt: G1Projective):
+    # (X : Y : Z)==(X/Z, Y/Z) is on E': y^2 = x^3 + A * x + B.
+    # y^2 z = (x^3) + A (x z^2) + B z^3
+    zsq = pt.z.square()
+    return (pt.y.square() * pt.z).eq(
+        (pt.x.square() * pt.x + SSWU_ELLP_A * pt.x * zsq + SSWU_ELLP_B * zsq * pt.z)
+    )
