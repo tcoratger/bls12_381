@@ -24,7 +24,6 @@ from src.pairing import (
     G2Prepared,
     multi_miller_loop,
 )
-
 from src.map_g1 import (
     sng0,
     P_M1_OVER2,
@@ -32,6 +31,8 @@ from src.map_g1 import (
     check_g1_prime,
     iso_map,
 )
+import hashlib
+import binascii
 
 
 class TestSignO(unittest.TestCase):
@@ -188,3 +189,65 @@ class TestOsswu(unittest.TestCase):
 
             p_iso = iso_map(p)
             self.assertTrue(p_iso.is_on_curve())
+
+
+class TestCase:
+    def __init__(self, msg, expected):
+        self.msg = msg
+        self.expected = expected
+
+    def expected_str(self):
+        return self.expected[0] + self.expected[1]
+
+
+DOMAIN = b"QUUX-V01-CS02-with-BLS12381G1_XMD:SHA-256_SSWU_NU_"
+
+cases = [
+    TestCase(
+        b"",
+        [
+            "184bb665c37ff561a89ec2122dd343f20e0f4cbcaec84e3c3052ea81d1834e192c426074b02ed3dca4e7676ce4ce48ba",
+            "04407b8d35af4dacc809927071fc0405218f1401a6d15af775810e4e460064bcc9468beeba82fdc751be70476c888bf3",
+        ],
+    ),
+    TestCase(
+        b"abc",
+        [
+            "009769f3ab59bfd551d53a5f846b9984c59b97d6842b20a2c565baa167945e3d026a3755b6345df8ec7e6acb6868ae6d",
+            "1532c00cf61aa3d0ce3e5aa20c3b531a2abd2c770a790a2613818303c6b830ffc0ecf6c357af3317b9575c567f11cd2c",
+        ],
+    ),
+    TestCase(
+        b"abcdef0123456789",
+        [
+            "1974dbb8e6b5d20b84df7e625e2fbfecb2cdb5f77d5eae5fb2955e5ce7313cae8364bc2fff520a6c25619739c6bdcb6a",
+            "15f9897e11c6441eaa676de141c8d83c37aab8667173cbe1dfd6de74d11861b961dccebcd9d289ac633455dfcc7013a3",
+        ],
+    ),
+    TestCase(
+        b"q128_qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+        b"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+        b"qqqqqqqqqqqqqqqqqqqqqqqqqq",
+        [
+            "0a7a047c4a8397b3446450642c2ac64d7239b61872c9ae7a59707a8f4f950f101e766afe58223b3bff3a19a7f754027c",
+            "1383aebba1e4327ccff7cf9912bda0dbc77de048b71ef8c8a81111d71dc33c5e3aa6edee9cf6f5fe525d50cc50b77cc9",
+        ],
+    ),
+    TestCase(
+        b"a512_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        [
+            "0e7a16a975904f131682edbb03d9560d3e48214c9986bd50417a77108d13dc957500edf96462a3d01e62dc6cd468ef11",
+            "0ae89e677711d05c30a48d6d75e76ca9fb70fe06c6dd6ff988683d89ccde29ac7d46c53bb97a59b1901abf1db66052db",
+        ],
+    ),
+]
