@@ -732,6 +732,53 @@ def map_to_curve_simple_swu(u: Fp):
     return G1Projective(x_num, y * x_den, x_den)
 
 
+# Maps an iso-G1 point to a G1 point.
+def iso_map(u: G1Projective):
+    COEFFS = [ISO11_XNUM, ISO11_XDEN, ISO11_YNUM, ISO11_YDEN]
+
+    # unpack input point
+    x, y, z = u.x, u.y, u.z
+
+    # xnum, xden, ynum, yden
+    mapvals = [Fp.zero()] * 4
+
+    # pre-compute powers of z
+    zpows = [Fp.zero()] * 15
+    zpows[0] = z
+    for idx in range(1, len(zpows)):
+        zpows[idx] = zpows[idx - 1] * z
+
+    # compute map value by Horner's rule
+    for idx in range(4):
+        coeff = COEFFS[idx]
+        clast = len(coeff) - 1
+        mapvals[idx] = coeff[clast]
+        for jdx in range(clast):
+            mapvals[idx] = mapvals[idx] * x + zpows[jdx] * coeff[clast - 1 - jdx]
+
+    # x denominator is order 1 less than x numerator, so we need an extra factor of z
+    mapvals[1] *= z
+
+    # multiply result of Y map by the y-coord, y / z
+    mapvals[2] *= y
+    mapvals[3] *= z
+
+    return G1Projective(
+        x=mapvals[0] * mapvals[3],  # xnum * yden,
+        y=mapvals[2] * mapvals[1],  # ynum * xden,
+        z=mapvals[1] * mapvals[3],  # xden * yden
+    )
+
+
+def map_to_curve(u: Fp):
+    pt = map_to_curve_simple_swu(u)
+    return iso_map(pt)
+
+
+def clear_h(g: G1Projective):
+    return g.clear_cofactor()
+
+
 def check_g1_prime(pt: G1Projective):
     # (X : Y : Z)==(X/Z, Y/Z) is on E': y^2 = x^3 + A * x + B.
     # y^2 z = (x^3) + A (x z^2) + B z^3

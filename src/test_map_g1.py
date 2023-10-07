@@ -25,7 +25,13 @@ from src.pairing import (
     multi_miller_loop,
 )
 
-from src.map_g1 import sng0, P_M1_OVER2, map_to_curve_simple_swu, check_g1_prime
+from src.map_g1 import (
+    sng0,
+    P_M1_OVER2,
+    map_to_curve_simple_swu,
+    check_g1_prime,
+    iso_map,
+)
 
 
 class TestSignO(unittest.TestCase):
@@ -169,3 +175,16 @@ class TestSimpleSwu(unittest.TestCase):
         self.assertTrue(y.eq(yo))
         self.assertTrue(z.eq(zo))
         self.assertTrue(check_g1_prime(p))
+
+
+class TestOsswu(unittest.TestCase):
+    def test_osswu_semirandom(self):
+        random.seed(0x5962BE5D763D318D17DB37325406BCE5)
+
+        for _ in range(32):
+            input_val = Fp.random(random.Random())
+            p = map_to_curve_simple_swu(input_val)
+            self.assertTrue(check_g1_prime(p))
+
+            p_iso = iso_map(p)
+            self.assertTrue(p_iso.is_on_curve())
